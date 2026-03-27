@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { X, Volume2, VolumeX } from 'lucide-react';
 
 // --- MOCK DATA ---
-// I've added `label: 'La Tregua'` to the 2nd and 5th books as an example.
+// I've added `label: 'La Tregua'` to the 5th and 8th books as an example.
 const INITIAL_BOOKS = [
   { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, height: 280, width: 30, starsColor: 'text-pink-600', coverUrl: './covers/my-book.jpeg' },
-  { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: './covers/my-book.jpeg', label: 'La Tregua' },
+  { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: './covers/my-book.jpeg' },
   { id: 3, title: 'RELATOS LUMBUNG', author: 'BROWN', color: 'bg-[#f4cc5c]', text: 'text-gray-800', rating: 3, height: 220, width: 36, starsColor: 'text-gray-800', coverUrl: './covers/my-book.jpeg' },
   { id: 4, title: 'ARDE JOSEFINA', author: 'REYES RETANA', color: 'bg-[#31565a]', text: 'text-white', rating: 3, height: 230, width: 38, starsColor: 'text-orange-400', coverUrl: './covers/my-book.jpeg' },
   { id: 5, title: 'NO DEJAR QUE SE APAGUE EL FUEGO', author: 'TOEWS', color: 'bg-[#379a78]', text: 'text-white', rating: 3, height: 230, width: 34, starsColor: 'text-gray-900', coverUrl: './covers/my-book.jpeg', label: 'La Tregua' },
   { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, height: 160, width: 40, starsColor: 'text-white', coverUrl: './covers/my-book.jpeg' },
   { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: './covers/my-book.jpeg' },
-  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/my-book.jpeg' }
+  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/my-book.jpeg', label: 'La Tregua' }
 ];
 
 // Tooltip String Helpers
