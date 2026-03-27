@@ -16,7 +16,7 @@ const INITIAL_BOOKS = [
 
 // --- GOOGLE SHEETS CONFIG ---
 // Replace this URL with your Published CSV link!
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQFTbUB0Ftr_qrVYeFU21w5jNC0q77MYjhUGvf7xRpPgsX2FLPSI5h5kAdTDjSaZPlQiU3wHLiXRgZ/pub?gid=0&single=true&output=csv';
+const SHEET_CSV_URL = 'YOUR_PUBLISHED_CSV_URL_HERE';
 
 // Tooltip String Helpers
 const toTitleCase = (str) => {
@@ -132,6 +132,24 @@ const parseGoogleSheetCSV = (csvText) => {
     }
   }
   return parsedBooks;
+};
+
+const getDeterminantColor = (str) => {
+  const PALETTE = [
+    { bg: 'bg-[#e76d5f]', text: 'text-white', star: 'text-white' },
+    { bg: 'bg-[#379a78]', text: 'text-white', star: 'text-yellow-300' },
+    { bg: 'bg-[#f4cc5c]', text: 'text-gray-900', star: 'text-gray-900' },
+    { bg: 'bg-[#31565a]', text: 'text-white', star: 'text-orange-400' },
+    { bg: 'bg-[#1e1f26]', text: 'text-gray-300', star: 'text-pink-600' },
+    { bg: 'bg-[#8944ab]', text: 'text-white', star: 'text-yellow-300' },
+    { bg: 'bg-[#3ba6d8]', text: 'text-white', star: 'text-white' },
+    { bg: 'bg-[#e90e63]', text: 'text-white', star: 'text-yellow-300' },
+    { bg: 'bg-[#d6a25e]', text: 'text-gray-900', star: 'text-gray-900' },
+    { bg: 'bg-[#1baab1]', text: 'text-white', star: 'text-yellow-200' },
+  ];
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  return PALETTE[Math.abs(hash) % PALETTE.length];
 };
 
 // --- COMPONENTS ---
@@ -392,6 +410,18 @@ export default function App() {
                 {books.length} Books Read
               </p>
               
+              {/* La Tregua Legend */}
+              <div className="flex items-center gap-2 mt-1 mb-2">
+                <img 
+                  src="./la-tregua-sticker.png" 
+                  alt="La Tregua Sticker" 
+                  className="w-5 h-5 rounded-full drop-shadow-md"
+                />
+                <span className="text-white/60 text-xs font-medium tracking-wide italic">
+                  Forma parte de "La Tregua Polígono de Lectura"
+                </span>
+              </div>
+
               {/* Profile Links */}
               <div className="flex gap-4 mt-3">
                 <a 
