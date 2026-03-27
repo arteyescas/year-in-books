@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Volume2, VolumeX } from 'lucide-react';
 
 // --- MOCK DATA ---
@@ -13,6 +13,10 @@ const INITIAL_BOOKS = [
   { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: './covers/Cabeza_de_mi_Padre.jpeg' },
   { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/Orbital.jpeg', label: 'La Tregua' }
 ];
+
+// --- GOOGLE SHEETS CONFIG ---
+// Replace this URL with your Published CSV link!
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQFTbUB0Ftr_qrVYeFU21w5jNC0q77MYjhUGvf7xRpPgsX2FLPSI5h5kAdTDjSaZPlQiU3wHLiXRgZ/pub?gid=0&single=true&output=csv';
 
 // Tooltip String Helpers
 const toTitleCase = (str) => {
@@ -64,6 +68,70 @@ const playHoverNote = (index) => {
 
   oscillator.start(now);
   oscillator.stop(now + 1.5);
+};
+
+// --- GOOGLE SHEETS PARSER ---
+const parseGoogleSheetCSV = (csvText) => {
+  const lines = csvText.split('\n');
+  if (lines.length < 2) return [];
+
+  const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
+  const titleIdx = headers.findIndex(h => h === 'title');
+  const authorIdx = headers.findIndex(h => h === 'author');
+  const ratingIdx = headers.findIndex(h => h === 'rating');
+  const pagesIdx = headers.findIndex(h => h === 'pages');
+  const coverIdx = headers.findIndex(h => h === 'cover url' || h === 'cover');
+  const labelIdx = headers.findIndex(h => h === 'label');
+
+  if (titleIdx === -1) return [];
+
+  const parsedBooks = [];
+  let idCounter = 1;
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+
+    const row = [];
+    let current = '';
+    let inQuotes = false;
+    for (let char of line) {
+      if (char === '"') inQuotes = !inQuotes;
+      else if (char === ',' && !inQuotes) { row.push(current); current = ''; }
+      else current += char;
+    }
+    row.push(current);
+
+    if (row.length > titleIdx && row[titleIdx]) {
+      const title = row[titleIdx].replace(/"/g, '').trim();
+      if (!title) continue;
+      
+      const author = authorIdx !== -1 && row[authorIdx] ? row[authorIdx].replace(/"/g, '').trim().toUpperCase() : 'UNKNOWN';
+      const rating = ratingIdx !== -1 ? parseInt(row[ratingIdx]) : 0;
+      const pages = pagesIdx !== -1 ? parseInt(row[pagesIdx]) : 300;
+      const coverUrl = coverIdx !== -1 && row[coverIdx] ? row[coverIdx].replace(/"/g, '').trim() : '';
+      const label = labelIdx !== -1 && row[labelIdx] ? row[labelIdx].replace(/"/g, '').trim() : '';
+
+      const style = getDeterminantColor(title);
+      const height = Math.min(Math.max((pages / 2) + 100, 160), 320);
+      const width = Math.min(Math.max((pages / 10) + 20, 24), 50);
+
+      parsedBooks.push({
+        id: idCounter++,
+        title: title.toUpperCase(),
+        author,
+        color: style.bg,
+        text: style.text,
+        starsColor: style.star,
+        rating: isNaN(rating) ? 0 : rating,
+        height,
+        width,
+        coverUrl,
+        label
+      });
+    }
+  }
+  return parsedBooks;
 };
 
 // --- COMPONENTS ---
@@ -199,6 +267,30 @@ export default function App() {
   
   const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, title: '', author: '', rating: 0 });
 
+  // Fetch books from Google Sheets on load
+  useEffect(() => {
+    const fetchBooks = async () => {
+      // Skip if the URL hasn't been added yet
+      if (SHEET_CSV_URL === 'YOUR_PUBLISHED_CSV_URL_HERE') return; 
+      
+      try {
+        const response = await fetch(SHEET_CSV_URL);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const csvText = await response.text();
+        const parsedBooks = parseGoogleSheetCSV(csvText);
+        
+        // Only override the mock data if we successfully found books in the sheet
+        if (parsedBooks.length > 0) {
+          setBooks(parsedBooks);
+        }
+      } catch (err) {
+        console.error("Failed to fetch books from Google Sheets:", err);
+      }
+    };
+
+    fetchBooks();
+  }, []);
+
   const handleToggleSound = () => {
     if (!soundEnabled) {
       if (!audioCtx) {
@@ -328,7 +420,7 @@ export default function App() {
       {/* Author Reference / Credits */}
       <div className="absolute bottom-4 left-4 z-50 text-white/50 text-[10px] sm:text-xs font-medium flex flex-col gap-1 drop-shadow-sm">
         <p>
-          Author: <a href="https://twitter.com/axayagrawal" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">@axayagrawal</a>
+          Original Creator: <a href="https://twitter.com/axayagrawal" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">@axayagrawal</a>
         </p>
         <div className="flex flex-col sm:flex-row gap-1 sm:gap-3">
           <a 
