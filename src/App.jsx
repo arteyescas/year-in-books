@@ -1,54 +1,18 @@
-import React, { useState, useRef } from 'react';
-import { Upload, X, Info, Volume2, VolumeX } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Volume2, VolumeX } from 'lucide-react';
 
 // --- MOCK DATA ---
-// I've added coverUrl to the first two books so you can see how it works!
+// I've added `label: 'La Tregua'` to the 2nd and 5th books as an example.
 const INITIAL_BOOKS = [
-  { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, height: 280, width: 30, starsColor: 'text-pink-600', coverUrl: './covers/The_Love_Lie.jpg' },
-  { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: './covers/Beatriz_y_los_cuerpos_celestes.jpg' },
-  { id: 3, title: 'RELATOS LUMBUNG', author: 'BROWN', color: 'bg-[#f4cc5c]', text: 'text-gray-800', rating: 3, height: 220, width: 36, starsColor: 'text-gray-800', coverUrl: './covers/Relatos_Lumbung.jpg' },
-  { id: 4, title: 'ARDE JOSEFINA', author: 'REYES RETANA', color: 'bg-[#31565a]', text: 'text-white', rating: 3, height: 230, width: 38, starsColor: 'text-orange-400', coverUrl: './covers/Arde_Josefina.jpg' },
-  { id: 5, title: 'NO DEJAR QUE SE APAGUE EL FUEGO', author: 'TOEWS', color: 'bg-[#379a78]', text: 'text-white', rating: 3, height: 230, width: 34, starsColor: 'text-gray-900', coverUrl: './covers/Fight_Night.jpg' },
-  { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, height: 160, width: 40, starsColor: 'text-white', coverUrl: './covers/Pensamiento_Erotico.jpg' },
-  { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: './covers/Cabeza_de_mi_Padre.jpg' },
-  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/Orbital.jpg' }
- // { id: 9, title: 'THE HARD THING ABOUT HARD THINGS', author: 'HOROWITZ', color: 'bg-[#d6a25e]', text: 'text-gray-900', rating: 4, height: 240, width: 36, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 10, title: 'GHACHAR GHOCHAR', author: 'SHANBHAG', color: 'bg-[#ece5cd]', text: 'text-gray-900', rating: 3, height: 190, width: 30, starsColor: 'text-gray-500', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 11, title: 'TINY EXPERIMENTS', author: 'CUFF', color: 'bg-[#153431]', text: 'text-yellow-500', rating: 4, height: 260, width: 38, starsColor: 'text-yellow-500', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 12, title: 'PIRANESI', author: 'CLARKE', color: 'bg-[#db3e29]', text: 'text-white', rating: 4, height: 250, width: 32, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 13, title: 'WHITE NIGHTS', author: 'DOSTOEVSKY', color: 'bg-[#f49315]', text: 'text-white', rating: 4, height: 250, width: 34, starsColor: 'text-white', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 14, title: 'V FOR VENDETTA', author: 'MOORE', color: 'bg-[#f2c140]', text: 'text-gray-900', rating: 3, height: 260, width: 38, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 15, title: 'OF MICE AND MEN', author: 'STEINBECK', color: 'bg-[#8944ab]', text: 'text-white', rating: 4, height: 180, width: 28, starsColor: 'text-yellow-300', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 16, title: 'THE HOUSEKEEPER AND THE PROFESSOR', author: 'OGAWA', color: 'bg-[#3ba6d8]', text: 'text-white', rating: 5, height: 220, width: 34, starsColor: 'text-white', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 17, title: 'THE MEMORY POLICE', author: 'OGAWA', color: 'bg-[#e90e63]', text: 'text-white', rating: 4, height: 260, width: 36, starsColor: 'text-yellow-300', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 18, title: 'HATCHING TWITTER', author: 'BILTON', color: 'bg-[#f4c81a]', text: 'text-gray-900', rating: 4, height: 260, width: 38, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 19, title: 'THE FALL', author: 'CAMUS', color: 'bg-[#1a384f]', text: 'text-white', rating: 4, height: 230, width: 30, starsColor: 'text-yellow-400', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 20, title: 'HOLES', author: 'SACHAR', color: 'bg-[#1baab1]', text: 'text-white', rating: 4, height: 220, width: 34, starsColor: 'text-yellow-200', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 21, title: 'BLACK EDGE', author: 'KOLHATKAR', color: 'bg-[#f18d0f]', text: 'text-gray-900', rating: 5, height: 250, width: 36, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 22, title: 'COMPANY OF ONE', author: 'JARVIS', color: 'bg-[#7a787b]', text: 'text-pink-200', rating: 4, height: 250, width: 34, starsColor: 'text-pink-300', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 23, title: 'GRIEF IS THE THING WITH FEATHERS', author: 'PORTER', color: 'bg-[#e2a099]', text: 'text-gray-900', rating: 4, height: 200, width: 28, starsColor: 'text-white', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
- //  { id: 24, title: "THE HOUSEMAID'S SECRET", author: 'MCFADDEN', color: 'bg-[#222126]', text: 'text-gray-300', rating: 3, height: 270, width: 38, starsColor: 'text-red-500', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+  { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, height: 280, width: 30, starsColor: 'text-pink-600', coverUrl: './covers/my-book.jpeg' },
+  { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: './covers/my-book.jpeg', label: 'La Tregua' },
+  { id: 3, title: 'RELATOS LUMBUNG', author: 'BROWN', color: 'bg-[#f4cc5c]', text: 'text-gray-800', rating: 3, height: 220, width: 36, starsColor: 'text-gray-800', coverUrl: './covers/my-book.jpeg' },
+  { id: 4, title: 'ARDE JOSEFINA', author: 'REYES RETANA', color: 'bg-[#31565a]', text: 'text-white', rating: 3, height: 230, width: 38, starsColor: 'text-orange-400', coverUrl: './covers/my-book.jpeg' },
+  { id: 5, title: 'NO DEJAR QUE SE APAGUE EL FUEGO', author: 'TOEWS', color: 'bg-[#379a78]', text: 'text-white', rating: 3, height: 230, width: 34, starsColor: 'text-gray-900', coverUrl: './covers/my-book.jpeg', label: 'La Tregua' },
+  { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, height: 160, width: 40, starsColor: 'text-white', coverUrl: './covers/my-book.jpeg' },
+  { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: './covers/my-book.jpeg' },
+  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/my-book.jpeg' }
 ];
-
-// --- UTILS ---
-const PALETTE = [
-  { bg: 'bg-[#e76d5f]', text: 'text-white', star: 'text-white' },
-  { bg: 'bg-[#379a78]', text: 'text-white', star: 'text-yellow-300' },
-  { bg: 'bg-[#f4cc5c]', text: 'text-gray-900', star: 'text-gray-900' },
-  { bg: 'bg-[#31565a]', text: 'text-white', star: 'text-orange-400' },
-  { bg: 'bg-[#1e1f26]', text: 'text-gray-300', star: 'text-pink-600' },
-  { bg: 'bg-[#8944ab]', text: 'text-white', star: 'text-yellow-300' },
-  { bg: 'bg-[#3ba6d8]', text: 'text-white', star: 'text-white' },
-  { bg: 'bg-[#e90e63]', text: 'text-white', star: 'text-yellow-300' },
-  { bg: 'bg-[#d6a25e]', text: 'text-gray-900', star: 'text-gray-900' },
-  { bg: 'bg-[#1baab1]', text: 'text-white', star: 'text-yellow-200' },
-];
-
-const getDeterminantColor = (str) => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  return PALETTE[Math.abs(hash) % PALETTE.length];
-};
 
 // Tooltip String Helpers
 const toTitleCase = (str) => {
@@ -101,73 +65,6 @@ const playHoverNote = (index) => {
   oscillator.start(now);
   oscillator.stop(now + 1.5);
 };
-
-// Robust-enough CSV Parser for Goodreads export
-const parseGoodreadsCSV = (csvText) => {
-  const lines = csvText.split('\n');
-  if (lines.length < 2) return [];
-
-  const headers = lines[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(h => h.replace(/"/g, '').trim());
-  const titleIdx = headers.indexOf('Title');
-  const authorIdx = headers.indexOf('Author');
-  const ratingIdx = headers.indexOf('My Rating');
-  const pagesIdx = headers.indexOf('Number of Pages');
-  const readDateIdx = headers.indexOf('Date Read');
-
-  if (titleIdx === -1) throw new Error("Could not find 'Title' column in CSV.");
-
-  const books = [];
-  let idCounter = 1;
-
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (!line.trim()) continue;
-
-    const row = [];
-    let current = '';
-    let inQuotes = false;
-    for (let char of line) {
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        row.push(current);
-        current = '';
-      } else {
-        current += char;
-      }
-    }
-    row.push(current);
-
-    if (row.length > titleIdx && row[titleIdx]) {
-      const title = row[titleIdx].replace(/"/g, '').trim();
-      
-      if (!title) continue;
-      
-      const author = authorIdx !== -1 && row[authorIdx] ? row[authorIdx].replace(/"/g, '').trim().split(',')[0].split(' ').pop().toUpperCase() : 'UNKNOWN';
-      const rating = ratingIdx !== -1 ? parseInt(row[ratingIdx]) : 0;
-      const pages = pagesIdx !== -1 ? parseInt(row[pagesIdx]) : 300;
-      const readDate = readDateIdx !== -1 ? row[readDateIdx].replace(/"/g, '').trim() : '';
-
-      const style = getDeterminantColor(title);
-      const height = Math.min(Math.max((pages / 2) + 100, 160), 320);
-      const width = Math.min(Math.max((pages / 10) + 20, 24), 50);
-
-      books.push({
-        id: idCounter++,
-        title: title.toUpperCase(),
-        author: author,
-        color: style.bg,
-        text: style.text,
-        starsColor: style.star,
-        rating: isNaN(rating) ? 0 : rating,
-        height,
-        width
-      });
-    }
-  }
-  return books;
-};
-
 
 // --- COMPONENTS ---
 
@@ -242,6 +139,26 @@ const Book = ({ book, index, soundEnabled, setTooltip, onClick }) => {
     >
       <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-white/10 pointer-events-none rounded-t-sm"></div>
       
+      {/* Label Sticker overlay */}
+      {book.label === 'La Tregua' && (
+        <div 
+          className="absolute z-20 pointer-events-none drop-shadow-md rounded-full overflow-hidden"
+          style={{ 
+            top: '32%', 
+            left: '50%',
+            transform: 'translateX(-50%) rotate(-4deg)', // Slight playful tilt
+            width: `${Math.min(book.width - 4, 28)}px`, // Scales slightly with spine, max 28px
+            height: `${Math.min(book.width - 4, 28)}px`,
+          }}
+        >
+          <img 
+            src="./la-tregua-sticker.png" 
+            alt="La Tregua Label" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
       <div className={`flex flex-col mt-4 gap-[1px] shrink-0 z-10 ${book.starsColor}`}>
         {Array.from({ length: book.rating || 0 }).map((_, i) => (
           <span key={i} className="text-[6px] leading-none">★</span>
@@ -274,11 +191,8 @@ const Book = ({ book, index, soundEnabled, setTooltip, onClick }) => {
 // --- MAIN APP ---
 export default function App() {
   const [books, setBooks] = useState(INITIAL_BOOKS);
-  const [showModal, setShowModal] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
-  const [error, setError] = useState('');
   const [selectedBook, setSelectedBook] = useState(null);
-  const fileInputRef = useRef(null);
   
   const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, title: '', author: '', rating: 0 });
 
@@ -298,29 +212,6 @@ export default function App() {
       osc.stop(audioCtx.currentTime + 0.01);
     }
     setSoundEnabled(!soundEnabled);
-  };
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const parsedBooks = parseGoodreadsCSV(event.target.result);
-        if (parsedBooks.length === 0) {
-          setError("No valid books found. Make sure this is a Goodreads CSV export.");
-        } else {
-          setBooks(parsedBooks);
-          setShowModal(false);
-          setError('');
-        }
-      } catch (err) {
-        setError("Error parsing CSV. Please ensure it's a valid Goodreads export file.");
-        console.error(err);
-      }
-    };
-    reader.readAsText(file);
   };
 
   return (
@@ -356,13 +247,6 @@ export default function App() {
           >
             {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
             {soundEnabled ? 'Sound On' : 'Sound Off'}
-          </button>
-          <button 
-            onClick={() => setShowModal(true)}
-            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm transition-all flex items-center gap-2 border border-white/10 shadow-sm"
-          >
-            <Upload size={16} />
-            Import CSV
           </button>
         </div>
       </div>
@@ -412,83 +296,31 @@ export default function App() {
               <p className="text-white/50 text-xs font-medium tracking-widest uppercase mb-2">
                 {books.length} Books Read
               </p>
-              {books.length > 0 && (
-                <button 
-                  onClick={() => setBooks([])}
-                  className="text-white/30 hover:text-white/80 text-[10px] uppercase tracking-wider transition-colors font-semibold drop-shadow-sm"
+              
+              {/* Profile Links */}
+              <div className="flex gap-4 mt-3">
+                <a 
+                  href="https://www.goodreads.com/user/show/70849724-artemisa" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white px-4 py-2 rounded-full text-xs font-medium backdrop-blur-sm transition-all border border-white/10 flex items-center gap-2 shadow-sm"
                 >
-                  Clear Shelf
-                </button>
-              )}
+                  📚 Goodreads
+                </a>
+                <a 
+                  href="https://pagebound.co/users/arteyescas" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white px-4 py-2 rounded-full text-xs font-medium backdrop-blur-sm transition-all border border-white/10 flex items-center gap-2 shadow-sm"
+                >
+                  ✨ Pagebound
+                </a>
+              </div>
             </div>
 
           </div>
         </div>
       </div>
-
-      {/* Goodreads Import Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-            <button 
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-            >
-              <X size={20} />
-            </button>
-            
-            <h3 className="text-2xl font-serif text-gray-900 mb-2">Connect Goodreads</h3>
-            <p className="text-gray-600 text-sm mb-6">
-              Goodreads disabled their developer API, so we can't connect automatically. Instead, you can export your library and drop the file here!
-            </p>
-
-            <div className="bg-blue-50 text-blue-800 p-4 rounded-xl text-sm mb-6 flex gap-3 items-start border border-blue-100">
-              <Info className="shrink-0 mt-0.5" size={18} />
-              <div>
-                <strong>How to get your CSV:</strong>
-                <ol className="list-decimal ml-4 mt-1 space-y-1">
-                  <li>Go to Goodreads.com and log in.</li>
-                  <li>Click "My Books" in the header.</li>
-                  <li>Scroll to the bottom left and click "Import and export".</li>
-                  <li>Click the "Export Library" button and save the CSV.</li>
-                </ol>
-              </div>
-            </div>
-
-            {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 border border-red-100">
-                {error}
-              </div>
-            )}
-
-            <input 
-              type="file" 
-              accept=".csv"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-
-            <button 
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full bg-[#386AF5] hover:bg-blue-700 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
-            >
-              <Upload size={18} />
-              Select Goodreads CSV File
-            </button>
-            
-            <button 
-              onClick={() => {
-                setBooks(INITIAL_BOOKS);
-                setShowModal(false);
-              }}
-              className="w-full mt-3 text-gray-500 hover:text-gray-800 py-2 text-sm font-medium"
-            >
-              Load Demo Shelf
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Book Cover Modal */}
       {selectedBook && (
