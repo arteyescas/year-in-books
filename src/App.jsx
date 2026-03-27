@@ -1,32 +1,33 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, Info, Plus, Volume2, VolumeX } from 'lucide-react';
+import { Upload, X, Info, Volume2, VolumeX } from 'lucide-react';
 
 // --- MOCK DATA ---
+// I've added coverUrl to the first two books so you can see how it works!
 const INITIAL_BOOKS = [
-  { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, height: 280, width: 44, starsColor: 'text-pink-600', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+  { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, height: 280, width: 30, starsColor: 'text-pink-600', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
   { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1348325603i/10836528.jpg' },
   { id: 3, title: 'RELATOS LUMBUNG', author: 'BROWN', color: 'bg-[#f4cc5c]', text: 'text-gray-800', rating: 3, height: 220, width: 36, starsColor: 'text-gray-800', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
   { id: 4, title: 'ARDE JOSEFINA', author: 'REYES RETANA', color: 'bg-[#31565a]', text: 'text-white', rating: 3, height: 230, width: 38, starsColor: 'text-orange-400', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
   { id: 5, title: 'NO DEJAR QUE SE APAGUE EL FUEGO', author: 'TOEWS', color: 'bg-[#379a78]', text: 'text-white', rating: 3, height: 230, width: 34, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, height: 160, width: 28, starsColor: 'text-white', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+  { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, height: 160, width: 40, starsColor: 'text-white', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
   { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, height: 180, width: 30, starsColor: 'text-yellow-400', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 9, title: 'THE HARD THING ABOUT HARD THINGS', author: 'HOROWITZ', color: 'bg-[#d6a25e]', text: 'text-gray-900', rating: 4, height: 240, width: 36, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 10, title: 'GHACHAR GHOCHAR', author: 'SHANBHAG', color: 'bg-[#ece5cd]', text: 'text-gray-900', rating: 3, height: 190, width: 30, starsColor: 'text-gray-500', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 11, title: 'TINY EXPERIMENTS', author: 'CUFF', color: 'bg-[#153431]', text: 'text-yellow-500', rating: 4, height: 260, width: 38, starsColor: 'text-yellow-500', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 12, title: 'PIRANESI', author: 'CLARKE', color: 'bg-[#db3e29]', text: 'text-white', rating: 4, height: 250, width: 32, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 13, title: 'WHITE NIGHTS', author: 'DOSTOEVSKY', color: 'bg-[#f49315]', text: 'text-white', rating: 4, height: 250, width: 34, starsColor: 'text-white', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 14, title: 'V FOR VENDETTA', author: 'MOORE', color: 'bg-[#f2c140]', text: 'text-gray-900', rating: 3, height: 260, width: 38, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 15, title: 'OF MICE AND MEN', author: 'STEINBECK', color: 'bg-[#8944ab]', text: 'text-white', rating: 4, height: 180, width: 28, starsColor: 'text-yellow-300', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 16, title: 'THE HOUSEKEEPER AND THE PROFESSOR', author: 'OGAWA', color: 'bg-[#3ba6d8]', text: 'text-white', rating: 5, height: 220, width: 34, starsColor: 'text-white', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 17, title: 'THE MEMORY POLICE', author: 'OGAWA', color: 'bg-[#e90e63]', text: 'text-white', rating: 4, height: 260, width: 36, starsColor: 'text-yellow-300', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 18, title: 'HATCHING TWITTER', author: 'BILTON', color: 'bg-[#f4c81a]', text: 'text-gray-900', rating: 4, height: 260, width: 38, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 19, title: 'THE FALL', author: 'CAMUS', color: 'bg-[#1a384f]', text: 'text-white', rating: 4, height: 230, width: 30, starsColor: 'text-yellow-400', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 20, title: 'HOLES', author: 'SACHAR', color: 'bg-[#1baab1]', text: 'text-white', rating: 4, height: 220, width: 34, starsColor: 'text-yellow-200', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 21, title: 'BLACK EDGE', author: 'KOLHATKAR', color: 'bg-[#f18d0f]', text: 'text-gray-900', rating: 5, height: 250, width: 36, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 22, title: 'COMPANY OF ONE', author: 'JARVIS', color: 'bg-[#7a787b]', text: 'text-pink-200', rating: 4, height: 250, width: 34, starsColor: 'text-pink-300', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 23, title: 'GRIEF IS THE THING WITH FEATHERS', author: 'PORTER', color: 'bg-[#e2a099]', text: 'text-gray-900', rating: 4, height: 200, width: 28, starsColor: 'text-white', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
-  { id: 24, title: "THE HOUSEMAID'S SECRET", author: 'MCFADDEN', color: 'bg-[#222126]', text: 'text-gray-300', rating: 3, height: 270, width: 38, starsColor: 'text-red-500', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' }
+ // { id: 9, title: 'THE HARD THING ABOUT HARD THINGS', author: 'HOROWITZ', color: 'bg-[#d6a25e]', text: 'text-gray-900', rating: 4, height: 240, width: 36, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 10, title: 'GHACHAR GHOCHAR', author: 'SHANBHAG', color: 'bg-[#ece5cd]', text: 'text-gray-900', rating: 3, height: 190, width: 30, starsColor: 'text-gray-500', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 11, title: 'TINY EXPERIMENTS', author: 'CUFF', color: 'bg-[#153431]', text: 'text-yellow-500', rating: 4, height: 260, width: 38, starsColor: 'text-yellow-500', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 12, title: 'PIRANESI', author: 'CLARKE', color: 'bg-[#db3e29]', text: 'text-white', rating: 4, height: 250, width: 32, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 13, title: 'WHITE NIGHTS', author: 'DOSTOEVSKY', color: 'bg-[#f49315]', text: 'text-white', rating: 4, height: 250, width: 34, starsColor: 'text-white', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 14, title: 'V FOR VENDETTA', author: 'MOORE', color: 'bg-[#f2c140]', text: 'text-gray-900', rating: 3, height: 260, width: 38, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 15, title: 'OF MICE AND MEN', author: 'STEINBECK', color: 'bg-[#8944ab]', text: 'text-white', rating: 4, height: 180, width: 28, starsColor: 'text-yellow-300', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 16, title: 'THE HOUSEKEEPER AND THE PROFESSOR', author: 'OGAWA', color: 'bg-[#3ba6d8]', text: 'text-white', rating: 5, height: 220, width: 34, starsColor: 'text-white', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 17, title: 'THE MEMORY POLICE', author: 'OGAWA', color: 'bg-[#e90e63]', text: 'text-white', rating: 4, height: 260, width: 36, starsColor: 'text-yellow-300', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 18, title: 'HATCHING TWITTER', author: 'BILTON', color: 'bg-[#f4c81a]', text: 'text-gray-900', rating: 4, height: 260, width: 38, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 19, title: 'THE FALL', author: 'CAMUS', color: 'bg-[#1a384f]', text: 'text-white', rating: 4, height: 230, width: 30, starsColor: 'text-yellow-400', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 20, title: 'HOLES', author: 'SACHAR', color: 'bg-[#1baab1]', text: 'text-white', rating: 4, height: 220, width: 34, starsColor: 'text-yellow-200', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 21, title: 'BLACK EDGE', author: 'KOLHATKAR', color: 'bg-[#f18d0f]', text: 'text-gray-900', rating: 5, height: 250, width: 36, starsColor: 'text-gray-900', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 22, title: 'COMPANY OF ONE', author: 'JARVIS', color: 'bg-[#7a787b]', text: 'text-pink-200', rating: 4, height: 250, width: 34, starsColor: 'text-pink-300', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 23, title: 'GRIEF IS THE THING WITH FEATHERS', author: 'PORTER', color: 'bg-[#e2a099]', text: 'text-gray-900', rating: 4, height: 200, width: 28, starsColor: 'text-white', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
+ //  { id: 24, title: "THE HOUSEMAID'S SECRET", author: 'MCFADDEN', color: 'bg-[#222126]', text: 'text-gray-300', rating: 3, height: 270, width: 38, starsColor: 'text-red-500', coverUrl: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1675206982i/60965426.jpg' },
 ];
 
 // --- UTILS ---
@@ -62,7 +63,7 @@ const renderStars = (rating) => {
 // --- AUDIO UTILS ---
 let audioCtx = null;
 
-// The melody notes for "Norwegian Wood" - The Beatles (A Murakami favorite)
+// The melody notes for "Norwegian Wood" - The Beatles
 const MURAKAMI_TUNE = [
   329.63, // E4 (I)
   293.66, // D4 (once)
@@ -81,13 +82,11 @@ const playHoverNote = (index) => {
   }
   if (audioCtx.state === 'suspended') audioCtx.resume();
 
-  // Cycle through the melody as they hover over the books
   const freq = MURAKAMI_TUNE[index % MURAKAMI_TUNE.length];
 
   const oscillator = audioCtx.createOscillator();
   const gainNode = audioCtx.createGain();
 
-  // 'triangle' gives a nice, soft electric-piano/vibraphone sound
   oscillator.type = 'triangle';
   oscillator.frequency.value = freq;
 
@@ -96,8 +95,8 @@ const playHoverNote = (index) => {
 
   const now = audioCtx.currentTime;
   gainNode.gain.setValueAtTime(0, now);
-  gainNode.gain.linearRampToValueAtTime(0.15, now + 0.05); // Gentle attack
-  gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.5); // Fade out
+  gainNode.gain.linearRampToValueAtTime(0.15, now + 0.05);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
 
   oscillator.start(now);
   oscillator.stop(now + 1.5);
@@ -108,7 +107,6 @@ const parseGoodreadsCSV = (csvText) => {
   const lines = csvText.split('\n');
   if (lines.length < 2) return [];
 
-  // Parse headers
   const headers = lines[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(h => h.replace(/"/g, '').trim());
   const titleIdx = headers.indexOf('Title');
   const authorIdx = headers.indexOf('Author');
@@ -125,7 +123,6 @@ const parseGoodreadsCSV = (csvText) => {
     const line = lines[i];
     if (!line.trim()) continue;
 
-    // Handle CSV quoting correctly
     const row = [];
     let current = '';
     let inQuotes = false;
@@ -144,7 +141,6 @@ const parseGoodreadsCSV = (csvText) => {
     if (row.length > titleIdx && row[titleIdx]) {
       const title = row[titleIdx].replace(/"/g, '').trim();
       
-      // Filter out empty rows or books not read
       if (!title) continue;
       
       const author = authorIdx !== -1 && row[authorIdx] ? row[authorIdx].replace(/"/g, '').trim().split(',')[0].split(' ').pop().toUpperCase() : 'UNKNOWN';
@@ -152,12 +148,7 @@ const parseGoodreadsCSV = (csvText) => {
       const pages = pagesIdx !== -1 ? parseInt(row[pagesIdx]) : 300;
       const readDate = readDateIdx !== -1 ? row[readDateIdx].replace(/"/g, '').trim() : '';
 
-      // Only include books read in the current year if a date exists, or all if no dates
-      if (readDate && !readDate.includes('2025') && !readDate.includes('2024')) continue; // Tweak as needed
-
       const style = getDeterminantColor(title);
-      
-      // Calculate realistic heights/widths based on pages
       const height = Math.min(Math.max((pages / 2) + 100, 160), 320);
       const width = Math.min(Math.max((pages / 10) + 20, 24), 50);
 
@@ -180,7 +171,6 @@ const parseGoodreadsCSV = (csvText) => {
 
 // --- COMPONENTS ---
 
-// New Animated Cloud with Pixel Dithering
 const AnimatedCloud = ({ top, durationClass, delay, scale = 1, opacity = 1 }) => {
   return (
     <div
@@ -193,20 +183,12 @@ const AnimatedCloud = ({ top, durationClass, delay, scale = 1, opacity = 1 }) =>
         animationDelay: delay,
       }}
     >
-      {/* Cloud shape composed of solid and dithered blocks */}
       <div className="flex flex-col items-center justify-center">
-        {/* Top block (dithered) */}
         <div className="w-16 h-4 dither-bg opacity-80"></div>
-        
-        {/* Middle block (solid) */}
         <div className="w-24 h-4 bg-white/95"></div>
-        
-        {/* Main block (solid with dithered shading on the bottom right) */}
         <div className="w-32 h-4 bg-white relative">
            <div className="absolute right-0 bottom-0 w-12 h-full dither-bg opacity-60"></div>
         </div>
-        
-        {/* Bottom block (dithered) */}
         <div className="w-20 h-4 dither-bg opacity-90 -mt-[1px]"></div>
       </div>
     </div>
@@ -214,24 +196,20 @@ const AnimatedCloud = ({ top, durationClass, delay, scale = 1, opacity = 1 }) =>
 };
 
 
-const Book = ({ book, index, soundEnabled, setTooltip }) => {
-  // Calculate font sizes primarily based on spine width for a comfortable fit
+const Book = ({ book, index, soundEnabled, setTooltip, onClick }) => {
   let maxTitleFsByWidth = book.width - 10; 
   let titleFontSize = Math.max(8, Math.min(13, maxTitleFsByWidth));
 
   let maxAuthorFsByWidth = book.width - 14;
   let authorFontSize = Math.max(7, Math.min(10, maxAuthorFsByWidth));
 
-  // Use a slightly larger modifier (0.85) to ensure we safely overestimate the text length
   const titleHeightEst = book.title.length * titleFontSize * 0.85;
   const authorHeightEst = book.author.length * authorFontSize * 0.85;
   
-  // 90px accounts for: Stars (~30px) + Gap between texts + Top/Bottom Padding (32px from py-4)
   const minTextHeight = titleHeightEst + authorHeightEst + 90;
   
   let finalHeight = Math.max(book.height, minTextHeight);
 
-  // If it's absurdly tall, cap the height and shrink the font instead so it never overflows
   if (finalHeight > 400) {
     const scale = 400 / minTextHeight;
     titleFontSize = Math.max(6, titleFontSize * scale);
@@ -241,6 +219,7 @@ const Book = ({ book, index, soundEnabled, setTooltip }) => {
 
   return (
     <div 
+      onClick={() => onClick && onClick(book)}
       onMouseEnter={(e) => {
         if (soundEnabled) playHoverNote(index);
         setTooltip({
@@ -261,22 +240,18 @@ const Book = ({ book, index, soundEnabled, setTooltip }) => {
       className={`relative flex flex-col items-center justify-between rounded-t-sm shadow-[-3px_0_8px_rgba(0,0,0,0.15)] border-l border-white/10 transition-transform duration-300 hover:-translate-y-4 hover:z-20 cursor-pointer overflow-hidden ${book.color} ${book.text}`}
       style={{ height: `${finalHeight}px`, width: `${book.width}px`, flexShrink: 0, marginRight: '1px' }}
     >
-      {/* Texture overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-white/10 pointer-events-none rounded-t-sm"></div>
       
-      {/* Stars - Fixed at top */}
       <div className={`flex flex-col mt-4 gap-[1px] shrink-0 z-10 ${book.starsColor}`}>
         {Array.from({ length: book.rating || 0 }).map((_, i) => (
           <span key={i} className="text-[6px] leading-none">★</span>
         ))}
       </div>
 
-      {/* Spine Text - Native Vertical Flow */}
       <div 
         className="flex-1 w-full flex justify-between items-center py-4 z-10"
         style={{ writingMode: 'vertical-rl' }}
       >
-        {/* Title (Starts at top) */}
         <span 
           className="font-bold whitespace-nowrap leading-none tracking-wide"
           style={{ fontSize: `${titleFontSize}px` }}
@@ -284,7 +259,6 @@ const Book = ({ book, index, soundEnabled, setTooltip }) => {
           {book.title}
         </span>
 
-        {/* Author Name (Pushed safely to the bottom by justify-between) */}
         <span 
           className="font-medium tracking-widest opacity-80 whitespace-nowrap leading-none"
           style={{ fontSize: `${authorFontSize}px` }}
@@ -301,24 +275,20 @@ const Book = ({ book, index, soundEnabled, setTooltip }) => {
 export default function App() {
   const [books, setBooks] = useState(INITIAL_BOOKS);
   const [showModal, setShowModal] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
-  const [newBookForm, setNewBookForm] = useState({ title: '', author: '', rating: 5, pages: 300 });
   const [error, setError] = useState('');
+  const [selectedBook, setSelectedBook] = useState(null);
   const fileInputRef = useRef(null);
   
-  // Custom Hover Tooltip State
   const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, title: '', author: '', rating: 0 });
 
   const handleToggleSound = () => {
     if (!soundEnabled) {
-      // Unlock the audio context on user click
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
       if (audioCtx.state === 'suspended') audioCtx.resume();
       
-      // Play a silent note to force the browser to unlock audio
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       gain.gain.value = 0;
@@ -328,38 +298,6 @@ export default function App() {
       osc.stop(audioCtx.currentTime + 0.01);
     }
     setSoundEnabled(!soundEnabled);
-  };
-
-  const handleAddBook = (e) => {
-    e.preventDefault();
-    if (!newBookForm.title.trim() || !newBookForm.author.trim()) return;
-
-    const title = newBookForm.title.trim().toUpperCase();
-    const author = newBookForm.author.trim().toUpperCase();
-    const pages = parseInt(newBookForm.pages) || 300;
-    const rating = parseInt(newBookForm.rating) || 0;
-
-    const style = getDeterminantColor(title);
-    
-    // Calculate realistic heights/widths based on pages
-    const height = Math.min(Math.max((pages / 2) + 100, 160), 320);
-    const width = Math.min(Math.max((pages / 10) + 20, 24), 50);
-
-    const newBook = {
-      id: Date.now(),
-      title,
-      author,
-      color: style.bg,
-      text: style.text,
-      starsColor: style.star,
-      rating,
-      height,
-      width
-    };
-
-    setBooks(prev => [...prev, newBook]);
-    setShowAddModal(false);
-    setNewBookForm({ title: '', author: '', rating: 5, pages: 300 });
   };
 
   const handleFileUpload = (e) => {
@@ -386,7 +324,6 @@ export default function App() {
   };
 
   return (
-    // Updated background color to #386AF5
     <div className="min-h-screen bg-[#386AF5] relative overflow-hidden font-sans selection:bg-white/30 flex flex-col">
       
       {/* Custom Hover Tooltip */}
@@ -396,7 +333,7 @@ export default function App() {
           style={{
             left: tooltip.x,
             top: tooltip.y,
-            transform: 'translate(-50%, -180%)', // Shift up slightly above cursor and center
+            transform: 'translate(-50%, -180%)', 
           }}
         >
           {toTitleCase(tooltip.title)} by {toTitleCase(tooltip.author)} 
@@ -419,13 +356,6 @@ export default function App() {
           >
             {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
             {soundEnabled ? 'Sound On' : 'Sound Off'}
-          </button>
-          <button 
-            onClick={() => setShowAddModal(true)}
-            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm transition-all flex items-center gap-2 border border-white/10 shadow-sm"
-          >
-            <Plus size={16} />
-            Add Book
           </button>
           <button 
             onClick={() => setShowModal(true)}
@@ -468,7 +398,7 @@ export default function App() {
             {/* Books Container */}
             <div className="flex items-end justify-center relative z-10 px-4">
               {books.map((book, index) => (
-                <Book key={book.id} book={book} index={index} soundEnabled={soundEnabled} setTooltip={setTooltip} />
+                <Book key={book.id} book={book} index={index} soundEnabled={soundEnabled} setTooltip={setTooltip} onClick={setSelectedBook} />
               ))}
             </div>
 
@@ -560,75 +490,38 @@ export default function App() {
         </div>
       )}
 
-      {/* Add Book Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      {/* Book Cover Modal */}
+      {selectedBook && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+          onClick={() => setSelectedBook(null)}
+        >
+          <div 
+            className="relative max-w-sm md:max-w-md w-full flex flex-col items-center"
+            onClick={e => e.stopPropagation()}
+          >
             <button 
-              onClick={() => setShowAddModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              onClick={() => setSelectedBook(null)}
+              className="absolute -top-12 right-0 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
             >
-              <X size={20} />
+              <X size={24} />
             </button>
             
-            <h3 className="text-2xl font-serif text-gray-900 mb-6">Add a Book</h3>
-            
-            <form onSubmit={handleAddBook} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                <input 
-                  type="text" 
-                  required
-                  value={newBookForm.title}
-                  onChange={e => setNewBookForm({...newBookForm, title: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="e.g. The Hobbit"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Author (Last Name)</label>
-                <input 
-                  type="text" 
-                  required
-                  value={newBookForm.author}
-                  onChange={e => setNewBookForm({...newBookForm, author: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="e.g. Tolkien"
-                />
-              </div>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Pages (Thickness)</label>
-                  <input 
-                    type="number" 
-                    required
-                    min="1"
-                    value={newBookForm.pages}
-                    onChange={e => setNewBookForm({...newBookForm, pages: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
+            {selectedBook.coverUrl ? (
+              <img 
+                src={selectedBook.coverUrl} 
+                alt={`${selectedBook.title} cover`} 
+                className="w-full max-h-[80vh] object-contain rounded-md shadow-2xl"
+              />
+            ) : (
+              <div className="w-64 h-96 bg-[#2a2b38] flex flex-col items-center justify-center rounded-md shadow-2xl border border-white/10 p-6 text-center">
+                <div className="w-16 h-16 mb-4 opacity-20 bg-white rounded-full flex items-center justify-center">
+                  <span className="text-2xl text-[#2a2b38]">?</span>
                 </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                  <select 
-                    value={newBookForm.rating}
-                    onChange={e => setNewBookForm({...newBookForm, rating: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                  >
-                    {[5,4,3,2,1,0].map(num => (
-                      <option key={num} value={num}>{num} {num === 1 ? 'Star' : 'Stars'}</option>
-                    ))}
-                  </select>
-                </div>
+                <p className="text-white/50 text-sm">No cover image added yet for</p>
+                <p className="text-white font-bold mt-2 font-serif">{selectedBook.title}</p>
               </div>
-              <button 
-                type="submit"
-                className="w-full mt-4 bg-[#386AF5] hover:bg-blue-700 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-md"
-              >
-                <Plus size={18} />
-                Add to Shelf
-              </button>
-            </form>
+            )}
           </div>
         </div>
       )}
