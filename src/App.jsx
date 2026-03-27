@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { X, Volume2, VolumeX } from 'lucide-react';
 
 // --- MOCK DATA ---
-// I've added `label: 'La Tregua'` to the 2nd and 5th books as an example.
 const INITIAL_BOOKS = [
   { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, height: 280, width: 30, starsColor: 'text-pink-600', coverUrl: './covers/The_Love_Lie.jpeg' },
   { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: './covers/Beatriz_y_los_cuerpos_celestes.jpeg' },
@@ -31,17 +30,16 @@ const renderStars = (rating) => {
 // --- AUDIO UTILS ---
 let audioCtx = null;
 
-// The melody notes for "Norwegian Wood" - The Beatles
 const MURAKAMI_TUNE = [
-  329.63, // E4 (I)
-  293.66, // D4 (once)
-  329.63, // E4 (had)
-  293.66, // D4 (a)
-  329.63, // E4 (girl)
-  246.94, // B3 (or)
-  293.66, // D4 (should)
-  261.63, // C4 (I)
-  220.00  // A3 (say)
+  329.63, // E4
+  293.66, // D4
+  329.63, // E4
+  293.66, // D4
+  329.63, // E4
+  246.94, // B3
+  293.66, // D4
+  261.63, // C4
+  220.00  // A3
 ];
 
 const playHoverNote = (index) => {
@@ -189,11 +187,9 @@ const Book = ({ book, index, soundEnabled, setTooltip, onClick }) => {
   const titleHeightEst = book.title.length * titleFontSize * 0.85;
   const authorHeightEst = book.author.length * authorFontSize * 0.85;
   
-  // Calculate sticker size and required spacing safely
   const stickerSize = Math.min(book.width - 4, 28);
   const stickerSpace = book.label === 'La Tregua' ? stickerSize + 16 : 0;
   
-  // Add stickerSpace to minTextHeight to ensure book stretches to fit everything
   const minTextHeight = titleHeightEst + authorHeightEst + 90 + stickerSpace;
   
   let finalHeight = Math.max(book.height, minTextHeight);
@@ -247,14 +243,13 @@ const Book = ({ book, index, soundEnabled, setTooltip, onClick }) => {
           {book.title}
         </span>
 
-        {/* Inline Label Sticker (Placed safely between Title and Author) */}
         {book.label === 'La Tregua' && (
           <div 
             className="z-20 drop-shadow-md rounded-full overflow-hidden shrink-0 my-2"
             style={{ 
               width: `${stickerSize}px`,
               height: `${stickerSize}px`,
-              transform: 'rotate(-4deg)', // Slight playful tilt
+              transform: 'rotate(-4deg)',
             }}
           >
             <img 
@@ -282,13 +277,12 @@ export default function App() {
   const [books, setBooks] = useState(INITIAL_BOOKS);
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
+  const [showStickerModal, setShowStickerModal] = useState(false); // New state for sticker modal
   
   const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, title: '', author: '', rating: 0 });
 
-  // Fetch books from Google Sheets on load
   useEffect(() => {
     const fetchBooks = async () => {
-      // Skip if the URL hasn't been added yet
       if (SHEET_CSV_URL === 'YOUR_PUBLISHED_CSV_URL_HERE') return; 
       
       try {
@@ -297,7 +291,6 @@ export default function App() {
         const csvText = await response.text();
         const parsedBooks = parseGoogleSheetCSV(csvText);
         
-        // Only override the mock data if we successfully found books in the sheet
         if (parsedBooks.length > 0) {
           setBooks(parsedBooks);
         }
@@ -415,10 +408,12 @@ export default function App() {
                 <img 
                   src="./la-tregua-sticker.png" 
                   alt="La Tregua Sticker" 
-                  className="w-5 h-5 rounded-full drop-shadow-md"
+                  className="w-5 h-5 rounded-full drop-shadow-md cursor-pointer hover:ring-2 hover:ring-white/50 hover:scale-110 transition-all"
+                  onClick={() => setShowStickerModal(true)}
+                  title="View full sticker"
                 />
                 <span className="text-white/60 text-xs font-medium tracking-wide italic">
-                  Forma parte de "La Tregua Polígono de Lectura"
+                  Forma parte de: "La Tregua - Polígono de Lectura"
                 </span>
               </div>
 
@@ -504,6 +499,32 @@ export default function App() {
                 <p className="text-white font-bold mt-2 font-serif">{selectedBook.title}</p>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* La Tregua Sticker Modal */}
+      {showStickerModal && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+          onClick={() => setShowStickerModal(false)}
+        >
+          <div 
+            className="relative max-w-sm md:max-w-md w-full flex flex-col items-center"
+            onClick={e => e.stopPropagation()}
+          >
+            <button 
+              onClick={() => setShowStickerModal(false)}
+              className="absolute -top-12 right-0 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+            >
+              <X size={24} />
+            </button>
+            
+            <img 
+              src="./la-tregua-sticker.png" 
+              alt="La Tregua Full Sticker" 
+              className="w-full max-h-[80vh] object-contain rounded-full shadow-2xl"
+            />
           </div>
         </div>
       )}
