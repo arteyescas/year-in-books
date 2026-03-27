@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { X, Volume2, VolumeX } from 'lucide-react';
 
 // --- MOCK DATA ---
-// I've added `label: 'La Tregua'` to the 5th and 8th books as an example.
+// I've added `label: 'La Tregua'` to the 2nd and 5th books as an example.
 const INITIAL_BOOKS = [
-  { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, height: 280, width: 30, starsColor: 'text-pink-600', coverUrl: './covers/my-book.jpeg' },
-  { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: './covers/my-book.jpeg' },
-  { id: 3, title: 'RELATOS LUMBUNG', author: 'BROWN', color: 'bg-[#f4cc5c]', text: 'text-gray-800', rating: 3, height: 220, width: 36, starsColor: 'text-gray-800', coverUrl: './covers/my-book.jpeg' },
-  { id: 4, title: 'ARDE JOSEFINA', author: 'REYES RETANA', color: 'bg-[#31565a]', text: 'text-white', rating: 3, height: 230, width: 38, starsColor: 'text-orange-400', coverUrl: './covers/my-book.jpeg' },
-  { id: 5, title: 'NO DEJAR QUE SE APAGUE EL FUEGO', author: 'TOEWS', color: 'bg-[#379a78]', text: 'text-white', rating: 3, height: 230, width: 34, starsColor: 'text-gray-900', coverUrl: './covers/my-book.jpeg', label: 'La Tregua' },
-  { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, height: 160, width: 40, starsColor: 'text-white', coverUrl: './covers/my-book.jpeg' },
-  { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: './covers/my-book.jpeg' },
-  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/my-book.jpeg', label: 'La Tregua' }
+  { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, height: 280, width: 30, starsColor: 'text-pink-600', coverUrl: './covers/The_Love_Lie.jpeg' },
+  { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: './covers/Beatriz_y_los_cuerpos_celestes.jpeg' },
+  { id: 3, title: 'RELATOS LUMBUNG', author: 'BROWN', color: 'bg-[#f4cc5c]', text: 'text-gray-800', rating: 3, height: 220, width: 36, starsColor: 'text-gray-800', coverUrl: './covers/Relatos_Lumbung.jpeg' },
+  { id: 4, title: 'ARDE JOSEFINA', author: 'REYES RETANA', color: 'bg-[#31565a]', text: 'text-white', rating: 3, height: 230, width: 38, starsColor: 'text-orange-400', coverUrl: './covers/Arde_Josefina.jpeg' },
+  { id: 5, title: 'NO DEJAR QUE SE APAGUE EL FUEGO', author: 'TOEWS', color: 'bg-[#379a78]', text: 'text-white', rating: 3, height: 230, width: 34, starsColor: 'text-gray-900', coverUrl: './covers/Fight_Night.jpeg', label: 'La Tregua' },
+  { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, height: 160, width: 40, starsColor: 'text-white', coverUrl: './covers/Pensamiento_Erotico.jpeg' },
+  { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: './covers/Cabeza_de_mi_Padre.jpeg' },
+  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/Orbital.jpeg', label: 'La Tregua' }
 ];
 
 // Tooltip String Helpers
@@ -103,7 +103,12 @@ const Book = ({ book, index, soundEnabled, setTooltip, onClick }) => {
   const titleHeightEst = book.title.length * titleFontSize * 0.85;
   const authorHeightEst = book.author.length * authorFontSize * 0.85;
   
-  const minTextHeight = titleHeightEst + authorHeightEst + 90;
+  // Calculate sticker size and required spacing safely
+  const stickerSize = Math.min(book.width - 4, 28);
+  const stickerSpace = book.label === 'La Tregua' ? stickerSize + 16 : 0;
+  
+  // Add stickerSpace to minTextHeight to ensure book stretches to fit everything
+  const minTextHeight = titleHeightEst + authorHeightEst + 90 + stickerSpace;
   
   let finalHeight = Math.max(book.height, minTextHeight);
 
@@ -138,26 +143,6 @@ const Book = ({ book, index, soundEnabled, setTooltip, onClick }) => {
       style={{ height: `${finalHeight}px`, width: `${book.width}px`, flexShrink: 0, marginRight: '1px' }}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-white/10 pointer-events-none rounded-t-sm"></div>
-      
-      {/* Label Sticker overlay */}
-      {book.label === 'La Tregua' && (
-        <div 
-          className="absolute z-20 pointer-events-none drop-shadow-md rounded-full overflow-hidden"
-          style={{ 
-            top: '32%', 
-            left: '50%',
-            transform: 'translateX(-50%) rotate(-4deg)', // Slight playful tilt
-            width: `${Math.min(book.width - 4, 28)}px`, // Scales slightly with spine, max 28px
-            height: `${Math.min(book.width - 4, 28)}px`,
-          }}
-        >
-          <img 
-            src="./la-tregua-sticker.png" 
-            alt="La Tregua Label" 
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
 
       <div className={`flex flex-col mt-4 gap-[1px] shrink-0 z-10 ${book.starsColor}`}>
         {Array.from({ length: book.rating || 0 }).map((_, i) => (
@@ -175,6 +160,24 @@ const Book = ({ book, index, soundEnabled, setTooltip, onClick }) => {
         >
           {book.title}
         </span>
+
+        {/* Inline Label Sticker (Placed safely between Title and Author) */}
+        {book.label === 'La Tregua' && (
+          <div 
+            className="z-20 drop-shadow-md rounded-full overflow-hidden shrink-0 my-2"
+            style={{ 
+              width: `${stickerSize}px`,
+              height: `${stickerSize}px`,
+              transform: 'rotate(-4deg)', // Slight playful tilt
+            }}
+          >
+            <img 
+              src="./la-tregua-sticker.png" 
+              alt="La Tregua Label" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
 
         <span 
           className="font-medium tracking-widest opacity-80 whitespace-nowrap leading-none"
@@ -319,6 +322,31 @@ export default function App() {
             </div>
 
           </div>
+        </div>
+      </div>
+
+      {/* Author Reference / Credits */}
+      <div className="absolute bottom-4 left-4 z-50 text-white/50 text-[10px] sm:text-xs font-medium flex flex-col gap-1 drop-shadow-sm">
+        <p>
+          Author: <a href="https://twitter.com/axayagrawal" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">@axayagrawal</a>
+        </p>
+        <div className="flex flex-col sm:flex-row gap-1 sm:gap-3">
+          <a 
+            href="https://axayagrawal.com/playground" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="hover:text-white transition-colors underline decoration-white/30 underline-offset-2"
+          >
+            Playground
+          </a>
+          <a 
+            href="https://axayagrawal.notion.site/how-i-vibe-coded-my-2025-bookshelf-with-claude" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="hover:text-white transition-colors underline decoration-white/30 underline-offset-2"
+          >
+            How it was done
+          </a>
         </div>
       </div>
 
