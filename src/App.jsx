@@ -286,7 +286,7 @@ const AnimatedCloud = ({ top, durationClass, delay, scale = 1, opacity = 1 }) =>
 };
 
 
-const Book = ({ book, index, soundEnabled, setTooltip }) => {
+const Book = ({ book, index, soundEnabled, setTooltip, onClick }) => {
   // Calculate font sizes primarily based on spine width for a comfortable fit
   let maxTitleFsByWidth = book.width - 10; 
   let titleFontSize = Math.max(8, Math.min(13, maxTitleFsByWidth));
@@ -316,6 +316,7 @@ const Book = ({ book, index, soundEnabled, setTooltip }) => {
 
   return (
     <div 
+      onClick={() => onClick && onClick(book)}
       onMouseEnter={(e) => {
         if (soundEnabled) playHoverNote(index);
         setTooltip({
@@ -409,29 +410,12 @@ export default function App() {
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
   
+  // Restored Modal States
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [showStickerModal, setShowStickerModal] = useState(false);
+  
   // Custom Hover Tooltip State
   const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, title: '', author: '', rating: 0 });
-
-  useEffect(() => {
-    const fetchBooks = async () => {
-      if (SHEET_CSV_URL === 'YOUR_PUBLISHED_CSV_URL_HERE' || SHEET_CSV_URL === '') return; 
-      
-      try {
-        const response = await fetch(SHEET_CSV_URL);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const csvText = await response.text();
-        const parsedBooks = parseGoogleSheetCSV(csvText);
-        
-        if (parsedBooks.length > 0) {
-          setBooks(parsedBooks);
-        }
-      } catch (err) {
-        console.error("Failed to fetch books from Google Sheets:", err);
-      }
-    };
-
-    fetchBooks();
-  }, []);
 
   const handleToggleSound = () => {
     if (!soundEnabled) {
@@ -591,7 +575,7 @@ export default function App() {
             {/* Books Container */}
             <div className="flex items-end justify-center relative z-10 px-4">
               {books.map((book, index) => (
-                <Book key={book.id} book={book} index={index} soundEnabled={soundEnabled} setTooltip={setTooltip} />
+                <Book key={book.id} book={book} index={index} soundEnabled={soundEnabled} setTooltip={setTooltip} onClick={setSelectedBook} />
               ))}
             </div>
 
@@ -605,10 +589,45 @@ export default function App() {
               <p className="text-white/50 text-xs font-medium tracking-widest uppercase mb-2">
                 {books.length} Books Read
               </p>
+              
+              {/* Restored: La Tregua Legend */}
+              <div className="flex items-center gap-2 mt-1 mb-2">
+                <img 
+                  src="./la-tregua-sticker.png" 
+                  alt="La Tregua Sticker" 
+                  className="w-5 h-5 rounded-full drop-shadow-md cursor-pointer hover:ring-2 hover:ring-white/50 hover:scale-110 transition-all"
+                  onClick={() => setShowStickerModal(true)}
+                  title="View full sticker"
+                />
+                <span className="text-white/60 text-xs font-medium tracking-wide italic">
+                  Forma parte de: La Tregua Polígono de Lectura
+                </span>
+              </div>
+
+              {/* Restored: Profile Links */}
+              <div className="flex gap-4 mt-3">
+                <a 
+                  href="https://www.goodreads.com/user/show/70849724-artemisa" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white px-4 py-2 rounded-full text-xs font-medium backdrop-blur-sm transition-all border border-white/10 flex items-center gap-2 shadow-sm"
+                >
+                  📚 Goodreads
+                </a>
+                <a 
+                  href="https://pagebound.co/users/arteyescas" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white px-4 py-2 rounded-full text-xs font-medium backdrop-blur-sm transition-all border border-white/10 flex items-center gap-2 shadow-sm"
+                >
+                  ✨ Pagebound
+                </a>
+              </div>
+
               {books.length > 0 && (
                 <button 
                   onClick={() => setBooks([])}
-                  className="text-white/30 hover:text-white/80 text-[10px] uppercase tracking-wider transition-colors font-semibold drop-shadow-sm"
+                  className="text-white/30 hover:text-white/80 text-[10px] uppercase tracking-wider transition-colors font-semibold drop-shadow-sm mt-3"
                 >
                   Clear Shelf
                 </button>
@@ -618,6 +637,93 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {/* Restored: Author Reference / Credits */}
+      <div className="absolute bottom-4 left-4 z-50 text-white/50 text-[10px] sm:text-xs font-medium flex flex-col gap-1 drop-shadow-sm">
+        <p>
+          Original Creator: <a href="https://twitter.com/axayagrawal" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">@axayagrawal</a>
+        </p>
+        <div className="flex flex-col sm:flex-row gap-1 sm:gap-3">
+          <a 
+            href="https://axayagrawal.com/playground" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="hover:text-white transition-colors underline decoration-white/30 underline-offset-2"
+          >
+            Playground
+          </a>
+          <a 
+            href="https://axayagrawal.notion.site/how-i-vibe-coded-my-2025-bookshelf-with-claude" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="hover:text-white transition-colors underline decoration-white/30 underline-offset-2"
+          >
+            How it was done
+          </a>
+        </div>
+      </div>
+
+      {/* Restored: Book Cover Modal */}
+      {selectedBook && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+          onClick={() => setSelectedBook(null)}
+        >
+          <div 
+            className="relative max-w-sm md:max-w-md w-full flex flex-col items-center"
+            onClick={e => e.stopPropagation()}
+          >
+            <button 
+              onClick={() => setSelectedBook(null)}
+              className="absolute -top-12 right-0 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+            >
+              <X size={24} />
+            </button>
+            
+            {selectedBook.coverUrl ? (
+              <img 
+                src={selectedBook.coverUrl} 
+                alt={`${selectedBook.title} cover`} 
+                className="w-full max-h-[80vh] object-contain rounded-md shadow-2xl"
+              />
+            ) : (
+              <div className="w-64 h-96 bg-[#2a2b38] flex flex-col items-center justify-center rounded-md shadow-2xl border border-white/10 p-6 text-center">
+                <div className="w-16 h-16 mb-4 opacity-20 bg-white rounded-full flex items-center justify-center">
+                  <span className="text-2xl text-[#2a2b38]">?</span>
+                </div>
+                <p className="text-white/50 text-sm">No cover image added yet for</p>
+                <p className="text-white font-bold mt-2 font-serif">{selectedBook.title}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Restored: La Tregua Sticker Modal */}
+      {showStickerModal && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+          onClick={() => setShowStickerModal(false)}
+        >
+          <div 
+            className="relative max-w-sm md:max-w-md w-full flex flex-col items-center"
+            onClick={e => e.stopPropagation()}
+          >
+            <button 
+              onClick={() => setShowStickerModal(false)}
+              className="absolute -top-12 right-0 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+            >
+              <X size={24} />
+            </button>
+            
+            <img 
+              src="./la-tregua-sticker.png" 
+              alt="La Tregua Full Sticker" 
+              className="w-full max-h-[80vh] object-contain rounded-full shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Goodreads Import Modal */}
       {showModal && (
