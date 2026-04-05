@@ -11,7 +11,7 @@ const INITIAL_BOOKS = [
   { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, height: 160, width: 40, starsColor: 'text-white', coverUrl: './covers/Pensamiento_Erotico.jpeg' },
   { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: './covers/Cabeza_de_mi_Padre.jpeg' },
   { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/Orbital.jpeg', label: 'La Tregua' },
-  { id: 9, title: 'PERSEPOLIS', author: 'SATRAPI', color: 'bg-[#1e1f26]', text: 'bg-[#f8b15d]', rating: 3, height: 180, width: 36, starsColor: 'text-pink-600', coverUrl: './covers/PERSEPOLIS.jpeg' }
+  { id: 9, title: 'PERSEPOLIS', author: 'SATRAPI', color: 'bg-[#1e1f26]', text: 'text-teal-400', rating: 4, height: 180, width: 36, starsColor: 'text-pink-600', coverUrl: './covers/PERSEPOLIS.jpeg' }
 ];
 
 // --- GOOGLE SHEETS CONFIG ---
