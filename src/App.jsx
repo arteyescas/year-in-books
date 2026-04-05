@@ -16,7 +16,7 @@ const INITIAL_BOOKS = [
 
 // --- GOOGLE SHEETS CONFIG ---
 // Replace this URL with your Published CSV link!
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQFTbUB0Ftr_qrVYeFU21w5jNC0q77MYjhUGvf7xRpPgsX2FLPSI5h5kAdTDjSaZPlQiU3wHLiXRgZ/pubhtml?gid=0&single=true';
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQFTbUB0Ftr_qrVYeFU21w5jNC0q77MYjhUGvf7xRpPgsX2FLPSI5h5kAdTDjSaZPlQiU3wHLiXRgZ/pub?gid=0&single=true&output=csv';
 
 // Tooltip String Helpers
 const toTitleCase = (str) => {
