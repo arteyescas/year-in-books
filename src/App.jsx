@@ -18,6 +18,9 @@ const INITIAL_BOOKS = [
 // Fixed URL to correctly output CSV data instead of the HTML page
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQFTbUB0Ftr_qrVYeFU21w5jNC0q77MYjhUGvf7xRpPgsX2FLPSI5h5kAdTDjSaZPlQiU3wHLiXRgZ/pub?gid=0&single=true&output=csv';
 
+// --- WEATHER API CONFIG (Hermosillo, Sonora) ---
+const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=29.073&longitude=-110.9559&current=weather_code&timezone=America%2FHermosillo';
+
 // --- UTILS ---
 const PALETTE = [
   { bg: 'bg-[#e76d5f]', text: 'text-white', star: 'text-white' },
@@ -47,6 +50,21 @@ const toTitleCase = (str) => {
 const renderStars = (rating) => {
   const safeRating = Math.max(0, Math.min(5, rating || 0));
   return '★'.repeat(safeRating) + '☆'.repeat(5 - safeRating);
+};
+
+// Map Open-Meteo WMO codes to our weather states
+const parseWeatherCode = (code) => {
+  if (code === undefined || code === null) return 'clear';
+  
+  // WMO Weather interpretation codes (https://open-meteo.com/en/docs)
+  if (code === 0 || code === 1) return 'clear'; // Clear sky, Mainly clear
+  if (code === 2 || code === 3) return 'cloudy'; // Partly cloudy, Overcast
+  if (code >= 51 && code <= 67) return 'rain'; // Drizzle and Rain
+  if (code >= 80 && code <= 82) return 'rain'; // Rain showers
+  if (code >= 95 && code <= 99) return 'thunderstorm'; // Thunderstorm
+  
+  // Ignore snow codes for Hermosillo, default to clear
+  return 'clear';
 };
 
 // --- AUDIO UTILS ---
@@ -179,7 +197,11 @@ const parseGoogleSheetCSV = (csvText) => {
 // --- COMPONENTS ---
 
 // New Animated Cloud with Pixel Dithering
-const AnimatedCloud = ({ top, durationClass, delay, scale = 1, opacity = 1 }) => {
+const AnimatedCloud = ({ top, durationClass, delay, scale = 1, opacity = 1, isCloudy = false }) => {
+  // If it's cloudy weather, make clouds denser and slightly darker
+  const finalOpacity = isCloudy ? Math.min(1, opacity + 0.3) : opacity;
+  const overlayClass = isCloudy ? "bg-gray-300" : "bg-white";
+  
   return (
     <div
       className={`absolute pointer-events-none ${durationClass}`}
@@ -187,7 +209,7 @@ const AnimatedCloud = ({ top, durationClass, delay, scale = 1, opacity = 1 }) =>
         top,
         left: '100%',
         transform: `scale(${scale})`,
-        opacity,
+        opacity: finalOpacity,
         animationDelay: delay,
       }}
     >
@@ -197,10 +219,10 @@ const AnimatedCloud = ({ top, durationClass, delay, scale = 1, opacity = 1 }) =>
         <div className="w-16 h-4 dither-bg opacity-80"></div>
         
         {/* Middle block (solid) */}
-        <div className="w-24 h-4 bg-white/95"></div>
+        <div className={`w-24 h-4 ${overlayClass} opacity-95`}></div>
         
         {/* Main block (solid with dithered shading on the bottom right) */}
-        <div className="w-32 h-4 bg-white relative">
+        <div className={`w-32 h-4 ${overlayClass} relative`}>
            <div className="absolute right-0 bottom-0 w-12 h-full dither-bg opacity-60"></div>
         </div>
         
@@ -356,13 +378,14 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(hasSheetUrl);
   
   const [soundEnabled, setSoundEnabled] = useState(false);
-  const fileInputRef = useRef(null);
   
-  // Dynamic Time of Day State
+  // Dynamic Environment States
   const [timeOfDay, setTimeOfDay] = useState('day');
+  const [weather, setWeather] = useState('clear'); // clear, cloudy, rain, thunderstorm
 
-  // Check the user's local time to update the sky!
+  // Check time and weather
   useEffect(() => {
+    // 1. Time logic
     const updateTime = () => {
       const hour = new Date().getHours();
       if (hour >= 6 && hour < 17) {
@@ -375,8 +398,30 @@ export default function App() {
     };
     
     updateTime(); // Set initially on load
-    const intervalId = setInterval(updateTime, 60000); // Check every minute
-    return () => clearInterval(intervalId);
+    const timeIntervalId = setInterval(updateTime, 60000); // Check time every minute
+    
+    // 2. Weather logic (Hermosillo)
+    const fetchWeather = async () => {
+      try {
+        const response = await fetch(WEATHER_API_URL);
+        if (response.ok) {
+          const data = await response.json();
+          const weatherCode = data.current?.weather_code;
+          setWeather(parseWeatherCode(weatherCode));
+        }
+      } catch (error) {
+        console.error("Failed to fetch weather for Hermosillo:", error);
+        // Silently fail to 'clear' if offline
+      }
+    };
+    
+    fetchWeather(); // Fetch on load
+    const weatherIntervalId = setInterval(fetchWeather, 300000); // Check weather every 5 mins
+    
+    return () => {
+      clearInterval(timeIntervalId);
+      clearInterval(weatherIntervalId);
+    };
   }, []);
   
   // Restored Modal States
@@ -444,20 +489,40 @@ export default function App() {
     ? (validRatings.reduce((sum, book) => sum + book.rating, 0) / validRatings.length).toFixed(1) 
     : '0.0';
 
-  // Background Theme Map
-  const themeStyles = {
-    day: 'bg-[#386AF5]',
-    evening: 'bg-gradient-to-b from-[#2b2d5c] via-[#853958] to-[#db6a50]',
-    night: 'bg-gradient-to-b from-[#060a14] via-[#0e162b] to-[#1a2642]'
+  // Background Theme Map (Time + Weather adjustments)
+  const getThemeClass = () => {
+    let base = '';
+    if (timeOfDay === 'day') {
+      base = weather === 'cloudy' ? 'bg-[#5a719c]' : (weather === 'rain' || weather === 'thunderstorm') ? 'bg-[#404c63]' : 'bg-[#386AF5]';
+    } else if (timeOfDay === 'evening') {
+      base = (weather === 'rain' || weather === 'thunderstorm') 
+        ? 'bg-gradient-to-b from-[#1c1d33] via-[#4d2a3c] to-[#6e3c32]' 
+        : 'bg-gradient-to-b from-[#2b2d5c] via-[#853958] to-[#db6a50]';
+    } else { // night
+      base = 'bg-gradient-to-b from-[#060a14] via-[#0e162b] to-[#1a2642]';
+    }
+    return base;
   };
 
   return (
-    // Dynamic Background Theme
-    <div className={`min-h-screen ${themeStyles[timeOfDay]} relative overflow-hidden font-sans selection:bg-white/30 flex flex-col transition-all duration-1000 ease-in-out`}>
+    // Dynamic Background Theme based on Time AND Weather
+    <div className={`min-h-screen ${getThemeClass()} relative overflow-hidden font-sans selection:bg-white/30 flex flex-col transition-all duration-1000 ease-in-out`}>
       
-      {/* Starry Sky Layer (Only visible at night) */}
-      {timeOfDay === 'night' && (
+      {/* Environment Effects Layer */}
+      
+      {/* Starry Sky Layer (Only visible at night, mostly hidden if raining) */}
+      {timeOfDay === 'night' && weather !== 'rain' && weather !== 'thunderstorm' && (
         <div className="absolute inset-0 stars-bg z-0 pointer-events-none opacity-70"></div>
+      )}
+      
+      {/* Rain Effect */}
+      {(weather === 'rain' || weather === 'thunderstorm') && (
+        <div className="absolute inset-0 rain-bg z-0 pointer-events-none opacity-40"></div>
+      )}
+      
+      {/* Lightning Effect */}
+      {weather === 'thunderstorm' && (
+        <div className="absolute inset-0 lightning-bg z-[1] pointer-events-none mix-blend-overlay"></div>
       )}
 
       {/* Custom Hover Tooltip */}
@@ -478,8 +543,12 @@ export default function App() {
 
       {/* Navbar / Tools */}
       <div className="absolute top-0 w-full p-4 flex justify-between items-start z-50">
-        <div className="text-white/50 text-xs font-medium tracking-wider mt-2 hidden sm:block drop-shadow-sm">
+        <div className="text-white/50 text-xs font-medium tracking-wider mt-2 hidden sm:block drop-shadow-sm flex items-center gap-2">
           BOOKSHELF VISUALIZER
+          {/* Subtle weather indicator for testing/curiosity */}
+          <span className="opacity-50 ml-2" title={`Hermosillo Weather: ${weather}`}>
+            {weather === 'clear' ? '☀️' : weather === 'cloudy' ? '☁️' : weather === 'rain' ? '🌧️' : '🌩️'}
+          </span>
         </div>
         <div className="flex gap-2 w-full sm:w-auto justify-between sm:justify-end">
           <button 
@@ -494,15 +563,24 @@ export default function App() {
         </div>
       </div>
 
-      {/* Animated Background Clouds Layer */}
+      {/* Animated Background Clouds Layer - Denser if cloudy/rainy */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <AnimatedCloud top="15%" durationClass="cloud-layer-1" delay="-10s" scale={1} opacity={0.9} />
-        <AnimatedCloud top="25%" durationClass="cloud-layer-2" delay="-40s" scale={0.7} opacity={0.6} />
-        <AnimatedCloud top="45%" durationClass="cloud-layer-3" delay="-70s" scale={0.8} opacity={0.7} />
-        <AnimatedCloud top="60%" durationClass="cloud-layer-1" delay="-25s" scale={1.2} opacity={0.85} />
-        <AnimatedCloud top="20%" durationClass="cloud-layer-4" delay="-5s" scale={1.1} opacity={0.95} />
-        <AnimatedCloud top="75%" durationClass="cloud-layer-2" delay="-55s" scale={0.6} opacity={0.5} />
-        <AnimatedCloud top="10%" durationClass="cloud-layer-3" delay="-90s" scale={0.9} opacity={0.8} />
+        <AnimatedCloud top="15%" durationClass="cloud-layer-1" delay="-10s" scale={1} opacity={0.9} isCloudy={weather !== 'clear'} />
+        <AnimatedCloud top="25%" durationClass="cloud-layer-2" delay="-40s" scale={0.7} opacity={0.6} isCloudy={weather !== 'clear'} />
+        <AnimatedCloud top="45%" durationClass="cloud-layer-3" delay="-70s" scale={0.8} opacity={0.7} isCloudy={weather !== 'clear'} />
+        <AnimatedCloud top="60%" durationClass="cloud-layer-1" delay="-25s" scale={1.2} opacity={0.85} isCloudy={weather !== 'clear'} />
+        <AnimatedCloud top="20%" durationClass="cloud-layer-4" delay="-5s" scale={1.1} opacity={0.95} isCloudy={weather !== 'clear'} />
+        
+        {/* Extra clouds if it's not clear */}
+        {weather !== 'clear' && (
+          <>
+            <AnimatedCloud top="35%" durationClass="cloud-layer-2" delay="-15s" scale={1.4} opacity={0.7} isCloudy={true} />
+            <AnimatedCloud top="55%" durationClass="cloud-layer-4" delay="-80s" scale={0.9} opacity={0.8} isCloudy={true} />
+          </>
+        )}
+        
+        <AnimatedCloud top="75%" durationClass="cloud-layer-2" delay="-55s" scale={0.6} opacity={0.5} isCloudy={weather !== 'clear'} />
+        <AnimatedCloud top="10%" durationClass="cloud-layer-3" delay="-90s" scale={0.9} opacity={0.8} isCloudy={weather !== 'clear'} />
       </div>
 
       {/* Scene Content */}
@@ -688,7 +766,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Global Styles for Scrollbar & Dithered Cloud Animations */}
+      {/* Global Styles for Scrollbar, Dithered Cloud Animations, and Weather Effects */}
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar {
           height: 8px;
@@ -752,6 +830,32 @@ export default function App() {
         @keyframes twinkle {
           0% { opacity: 0.4; }
           100% { opacity: 1; }
+        }
+        
+        /* Rain CSS Pattern */
+        .rain-bg {
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M10 0 L5 20 M30 10 L25 30 M50 5 L45 25 M70 15 L65 35 M90 0 L85 20 M20 50 L15 70 M40 60 L35 80 M60 45 L55 65 M80 55 L75 75' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-linecap='round' /%3E%3C/svg%3E");
+          background-size: 100px 100px;
+          animation: rain-fall 0.4s linear infinite;
+        }
+        
+        @keyframes rain-fall {
+          0% { background-position: 0px 0px; }
+          100% { background-position: -25px 100px; }
+        }
+        
+        /* Lightning CSS Animation */
+        .lightning-bg {
+          background-color: white;
+          opacity: 0;
+          animation: lightning-flash 15s infinite;
+        }
+        
+        @keyframes lightning-flash {
+          0%, 95%, 98%, 100% { opacity: 0; }
+          96% { opacity: 0.8; }
+          97% { opacity: 0; }
+          97.5% { opacity: 0.5; }
         }
       `}} />
     </div>
