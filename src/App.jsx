@@ -3,15 +3,15 @@ import { X, Volume2, VolumeX } from 'lucide-react';
 
 // --- MOCK DATA ---
 const INITIAL_BOOKS = [
-  { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, height: 280, width: 30, starsColor: 'text-pink-600', coverUrl: './covers/The_Love_Lie.jpeg' },
-  { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: './covers/Beatriz_y_los_cuerpos_celestes.jpeg' },
-  { id: 3, title: 'RELATOS LUMBUNG', author: 'BROWN', color: 'bg-[#f4cc5c]', text: 'text-gray-800', rating: 3, height: 220, width: 36, starsColor: 'text-gray-800', coverUrl: './covers/Relatos_Lumbung.jpeg' },
-  { id: 4, title: 'ARDE JOSEFINA', author: 'REYES RETANA', color: 'bg-[#31565a]', text: 'text-white', rating: 3, height: 230, width: 38, starsColor: 'text-orange-400', coverUrl: './covers/Arde_Josefina.jpeg' },
-  { id: 5, title: 'NO DEJAR QUE SE APAGUE EL FUEGO', author: 'TOEWS', color: 'bg-[#379a78]', text: 'text-white', rating: 3, height: 230, width: 34, starsColor: 'text-gray-900', coverUrl: './covers/Fight_Night.jpeg', label: 'La Tregua' },
-  { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, height: 160, width: 40, starsColor: 'text-white', coverUrl: './covers/Pensamiento_Erotico.jpeg' },
-  { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: './covers/Cabeza_de_mi_Padre.jpeg' },
-  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/Orbital.jpeg', label: 'La Tregua' },
-  { id: 9, title: 'PERSEPOLIS', author: 'SATRAPI', color: 'bg-[#1e1f26]', text: 'text-teal-400', rating: 4, height: 160, width: 36, starsColor: 'text-pink-600', coverUrl: './covers/PERSEPOLIS.jpeg' }
+  { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, pages: 360, height: 280, width: 30, starsColor: 'text-pink-600', coverUrl: './covers/The_Love_Lie.jpeg' },
+  { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, pages: 180, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: './covers/Beatriz_y_los_cuerpos_celestes.jpeg' },
+  { id: 3, title: 'RELATOS LUMBUNG', author: 'BROWN', color: 'bg-[#f4cc5c]', text: 'text-gray-800', rating: 3, pages: 240, height: 220, width: 36, starsColor: 'text-gray-800', coverUrl: './covers/Relatos_Lumbung.jpeg' },
+  { id: 4, title: 'ARDE JOSEFINA', author: 'REYES RETANA', color: 'bg-[#31565a]', text: 'text-white', rating: 3, pages: 260, height: 230, width: 38, starsColor: 'text-orange-400', coverUrl: './covers/Arde_Josefina.jpeg' },
+  { id: 5, title: 'NO DEJAR QUE SE APAGUE EL FUEGO', author: 'TOEWS', color: 'bg-[#379a78]', text: 'text-white', rating: 3, pages: 260, height: 230, width: 34, starsColor: 'text-gray-900', coverUrl: './covers/Fight_Night.jpeg', label: 'La Tregua' },
+  { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, pages: 120, height: 160, width: 40, starsColor: 'text-white', coverUrl: './covers/Pensamiento_Erotico.jpeg' },
+  { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, pages: 120, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: './covers/Cabeza_de_mi_Padre.jpeg' },
+  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, pages: 300, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/Orbital.jpeg', label: 'La Tregua' },
+  { id: 9, title: 'PERSEPOLIS', author: 'SATRAPI', color: 'bg-[#1e1f26]', text: 'text-teal-400', rating: 4, pages: 120, height: 160, width: 36, starsColor: 'text-pink-600', coverUrl: './covers/PERSEPOLIS.jpeg' }
 ];
 
 // --- GOOGLE SHEETS CONFIG ---
@@ -162,6 +162,7 @@ const parseGoogleSheetCSV = (csvText) => {
         text: style.text,
         starsColor: style.star,
         rating: isNaN(rating) ? 0 : rating,
+        pages: isNaN(pages) ? 300 : pages, // Saved so we can tally stats!
         height,
         width,
         coverUrl,
@@ -335,6 +336,27 @@ export default function App() {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const fileInputRef = useRef(null);
   
+  // Dynamic Time of Day State
+  const [timeOfDay, setTimeOfDay] = useState('day');
+
+  // Check the user's local time to update the sky!
+  useEffect(() => {
+    const updateTime = () => {
+      const hour = new Date().getHours();
+      if (hour >= 6 && hour < 17) {
+        setTimeOfDay('day');       // 6 AM to 5 PM
+      } else if (hour >= 17 && hour < 20) {
+        setTimeOfDay('evening');   // 5 PM to 8 PM (Sunset)
+      } else {
+        setTimeOfDay('night');     // 8 PM to 6 AM (Night)
+      }
+    };
+    
+    updateTime(); // Set initially on load
+    const intervalId = setInterval(updateTime, 60000); // Check every minute
+    return () => clearInterval(intervalId);
+  }, []);
+  
   // Restored Modal States
   const [selectedBook, setSelectedBook] = useState(null);
   const [showStickerModal, setShowStickerModal] = useState(false);
@@ -393,10 +415,29 @@ export default function App() {
     setSoundEnabled(!soundEnabled);
   };
 
+  // --- DERIVED STATS ---
+  const totalPages = books.reduce((sum, book) => sum + (book.pages || 0), 0);
+  const validRatings = books.filter(b => b.rating && b.rating > 0);
+  const averageRating = validRatings.length > 0 
+    ? (validRatings.reduce((sum, book) => sum + book.rating, 0) / validRatings.length).toFixed(1) 
+    : '0.0';
+
+  // Background Theme Map
+  const themeStyles = {
+    day: 'bg-[#386AF5]',
+    evening: 'bg-gradient-to-b from-[#2b2d5c] via-[#853958] to-[#db6a50]',
+    night: 'bg-gradient-to-b from-[#060a14] via-[#0e162b] to-[#1a2642]'
+  };
+
   return (
-    // Updated background color to #386AF5
-    <div className="min-h-screen bg-[#386AF5] relative overflow-hidden font-sans selection:bg-white/30 flex flex-col">
+    // Dynamic Background Theme
+    <div className={`min-h-screen ${themeStyles[timeOfDay]} relative overflow-hidden font-sans selection:bg-white/30 flex flex-col transition-all duration-1000 ease-in-out`}>
       
+      {/* Starry Sky Layer (Only visible at night) */}
+      {timeOfDay === 'night' && (
+        <div className="absolute inset-0 stars-bg z-0 pointer-events-none opacity-70"></div>
+      )}
+
       {/* Custom Hover Tooltip */}
       {tooltip.show && (
         <div 
@@ -481,9 +522,19 @@ export default function App() {
             </div>
             
             <div className="mt-8 flex flex-col items-center">
-              <p className="text-white/50 text-xs font-medium tracking-widest uppercase mb-2">
-                {books.length} Books Read
-              </p>
+              
+              {/* Dynamic Stats Row */}
+              <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 text-white/50 text-xs font-medium tracking-widest uppercase mb-2 drop-shadow-sm">
+                <span>{books.length} {books.length === 1 ? 'Book' : 'Books'}</span>
+                {books.length > 0 && (
+                  <>
+                    <span className="opacity-40 text-[10px]">●</span>
+                    <span>{totalPages.toLocaleString()} Pages</span>
+                    <span className="opacity-40 text-[10px]">●</span>
+                    <span className="flex items-center gap-1">{averageRating} <span className="text-[10px] -mt-0.5">★</span> Avg</span>
+                  </>
+                )}
+              </div>
               
               {/* Restored: La Tregua Legend */}
               <div className="flex items-center gap-2 mt-1 mb-2">
@@ -663,6 +714,28 @@ export default function App() {
         .cloud-layer-2 { animation: drift 85s linear infinite; }
         .cloud-layer-3 { animation: drift 120s linear infinite; }
         .cloud-layer-4 { animation: drift 45s linear infinite; }
+
+        /* Starry Night CSS Pattern */
+        .stars-bg {
+          background-image: 
+            radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 200px 20px, #fff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 250px 90px, #eee, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 300px 150px, #fff, rgba(0,0,0,0));
+          background-repeat: repeat;
+          background-size: 350px 350px;
+          animation: twinkle 4s infinite alternate;
+        }
+        
+        @keyframes twinkle {
+          0% { opacity: 0.4; }
+          100% { opacity: 1; }
+        }
       `}} />
     </div>
   );
