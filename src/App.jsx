@@ -211,6 +211,28 @@ const AnimatedCloud = ({ top, durationClass, delay, scale = 1, opacity = 1 }) =>
   );
 };
 
+// Animated Pixel Cat Bookend Component
+const PixelCat = ({ flip = false }) => {
+  return (
+    <div 
+      className={`shrink-0 z-20 flex items-end ${flip ? 'scale-x-[-1]' : ''} drop-shadow-xl`} 
+      style={{ width: '64px', height: '64px', margin: '0 4px', marginBottom: '-21px' }}
+    >
+      <img 
+        // Replace the link below with your direct .gif link if you want to change it!
+        src="https://i.pinimg.com/originals/e8/d0/f1/e8d0f1794e2520ac2367c1d21c0966e9.gif" 
+        alt="Animated Pixel Cat" 
+        className="w-full h-full object-contain pointer-events-none"
+        style={{ imageRendering: 'pixelated' }}
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.style.display = 'none'; // Hide gracefully if the image link ever breaks
+        }}
+      />
+    </div>
+  );
+};
+
 
 const Book = ({ book, index, soundEnabled, setTooltip, onClick }) => {
   // Calculate font sizes primarily based on spine width for a comfortable fit
@@ -500,7 +522,7 @@ export default function App() {
         <div className="relative w-full max-w-[95%] overflow-x-auto pb-8 pt-12 custom-scrollbar">
           <div className="min-w-max mx-auto px-12 md:px-24 flex flex-col items-center">
             
-            {/* Books Container */}
+            {/* Books Container with Pixel Cats acting as Bookends */}
             <div className="flex items-end justify-center relative z-10 px-4 min-h-[320px]">
               {isLoading ? (
                 <div className="flex items-center justify-center h-full w-full absolute pb-10">
@@ -509,9 +531,13 @@ export default function App() {
                   </div>
                 </div>
               ) : (
-                books.map((book, index) => (
-                  <Book key={book.id} book={book} index={index} soundEnabled={soundEnabled} setTooltip={setTooltip} onClick={setSelectedBook} />
-                ))
+                <>
+                  {books.length > 0 && <PixelCat />}
+                  {books.map((book, index) => (
+                    <Book key={book.id} book={book} index={index} soundEnabled={soundEnabled} setTooltip={setTooltip} onClick={setSelectedBook} />
+                  ))}
+                  {books.length > 0 && <PixelCat flip />}
+                </>
               )}
             </div>
 
