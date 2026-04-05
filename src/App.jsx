@@ -145,6 +145,7 @@ const getDeterminantColor = (str) => {
     { bg: 'bg-[#e90e63]', text: 'text-white', star: 'text-yellow-300' },
     { bg: 'bg-[#d6a25e]', text: 'text-gray-900', star: 'text-gray-900' },
     { bg: 'bg-[#1baab1]', text: 'text-white', star: 'text-yellow-200' },
+    { bg: 'bg-[#1e1f26]', text: 'text-teal-400', stars: 'text-pink-600'}
   ];
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
