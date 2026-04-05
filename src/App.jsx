@@ -569,15 +569,6 @@ export default function App() {
                   ✨ Pagebound
                 </a>
               </div>
-
-              {books.length > 0 && (
-                <button 
-                  onClick={() => setBooks([])}
-                  className="text-white/30 hover:text-white/80 text-[10px] uppercase tracking-wider transition-colors font-semibold drop-shadow-sm mt-3"
-                >
-                  Clear Shelf
-                </button>
-              )}
             </div>
 
           </div>
