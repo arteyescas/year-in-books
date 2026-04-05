@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Upload, X, Info, Plus, Volume2, VolumeX } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Volume2, VolumeX } from 'lucide-react';
 
 // --- MOCK DATA ---
 const INITIAL_BOOKS = [
@@ -175,81 +175,6 @@ const parseGoogleSheetCSV = (csvText) => {
   return parsedBooks;
 };
 
-// Robust-enough CSV Parser for Goodreads export
-const parseGoodreadsCSV = (csvText) => {
-  const lines = csvText.split('\n');
-  if (lines.length < 2) return [];
-
-  // Parse headers
-  const headers = lines[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(h => h.replace(/"/g, '').trim());
-  const titleIdx = headers.indexOf('Title');
-  const authorIdx = headers.indexOf('Author');
-  const ratingIdx = headers.indexOf('My Rating');
-  const pagesIdx = headers.indexOf('Number of Pages');
-  const readDateIdx = headers.indexOf('Date Read');
-
-  if (titleIdx === -1) throw new Error("Could not find 'Title' column in CSV.");
-
-  const books = [];
-  let idCounter = 1;
-
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (!line.trim()) continue;
-
-    // Handle CSV quoting correctly
-    const row = [];
-    let current = '';
-    let inQuotes = false;
-    for (let char of line) {
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        row.push(current);
-        current = '';
-      } else {
-        current += char;
-      }
-    }
-    row.push(current);
-
-    if (row.length > titleIdx && row[titleIdx]) {
-      const title = row[titleIdx].replace(/"/g, '').trim();
-      
-      // Filter out empty rows or books not read
-      if (!title) continue;
-      
-      const author = authorIdx !== -1 && row[authorIdx] ? row[authorIdx].replace(/"/g, '').trim().split(',')[0].split(' ').pop().toUpperCase() : 'UNKNOWN';
-      const rating = ratingIdx !== -1 ? parseInt(row[ratingIdx]) : 0;
-      const pages = pagesIdx !== -1 ? parseInt(row[pagesIdx]) : 300;
-      const readDate = readDateIdx !== -1 ? row[readDateIdx].replace(/"/g, '').trim() : '';
-
-      // Only include books read in the current year if a date exists, or all if no dates
-      if (readDate && !readDate.includes('2025') && !readDate.includes('2024')) continue; // Tweak as needed
-
-      const style = getDeterminantColor(title);
-      
-      // Calculate realistic heights/widths based on pages
-      const height = Math.min(Math.max((pages / 2) + 100, 160), 320);
-      const width = Math.min(Math.max((pages / 10) + 20, 24), 50);
-
-      books.push({
-        id: idCounter++,
-        title: title.toUpperCase(),
-        author: author,
-        color: style.bg,
-        text: style.text,
-        starsColor: style.star,
-        rating: isNaN(rating) ? 0 : rating,
-        height,
-        width
-      });
-    }
-  }
-  return books;
-};
-
-
 // --- COMPONENTS ---
 
 // New Animated Cloud with Pixel Dithering
@@ -402,12 +327,12 @@ const Book = ({ book, index, soundEnabled, setTooltip, onClick }) => {
 
 // --- MAIN APP ---
 export default function App() {
-  const [books, setBooks] = useState(INITIAL_BOOKS);
-  const [showModal, setShowModal] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const hasSheetUrl = SHEET_CSV_URL && SHEET_CSV_URL !== 'YOUR_PUBLISHED_CSV_URL_HERE';
+  // Start empty if we are going to load from a sheet to prevent flashing
+  const [books, setBooks] = useState(hasSheetUrl ? [] : INITIAL_BOOKS);
+  const [isLoading, setIsLoading] = useState(hasSheetUrl);
+  
   const [soundEnabled, setSoundEnabled] = useState(false);
-  const [newBookForm, setNewBookForm] = useState({ title: '', author: '', rating: 5, pages: 300 });
-  const [error, setError] = useState('');
   const fileInputRef = useRef(null);
   
   // Restored Modal States
@@ -416,6 +341,37 @@ export default function App() {
   
   // Custom Hover Tooltip State
   const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, title: '', author: '', rating: 0 });
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      if (!hasSheetUrl) {
+        setIsLoading(false);
+        return; 
+      }
+      
+      try {
+        const response = await fetch(SHEET_CSV_URL);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const csvText = await response.text();
+        const parsedBooks = parseGoogleSheetCSV(csvText);
+        
+        if (parsedBooks.length > 0) {
+          setBooks(parsedBooks);
+        } else {
+          // Fallback if the sheet is empty
+          setBooks(INITIAL_BOOKS);
+        }
+      } catch (err) {
+        console.error("Failed to fetch books from Google Sheets:", err);
+        setBooks(INITIAL_BOOKS);
+      } finally {
+        // Hide loading animation whether it succeeded or failed
+        setIsLoading(false);
+      }
+    };
+
+    fetchBooks();
+  }, [hasSheetUrl]);
 
   const handleToggleSound = () => {
     if (!soundEnabled) {
@@ -435,61 +391,6 @@ export default function App() {
       osc.stop(audioCtx.currentTime + 0.01);
     }
     setSoundEnabled(!soundEnabled);
-  };
-
-  const handleAddBook = (e) => {
-    e.preventDefault();
-    if (!newBookForm.title.trim() || !newBookForm.author.trim()) return;
-
-    const title = newBookForm.title.trim().toUpperCase();
-    const author = newBookForm.author.trim().toUpperCase();
-    const pages = parseInt(newBookForm.pages) || 300;
-    const rating = parseInt(newBookForm.rating) || 0;
-
-    const style = getDeterminantColor(title);
-    
-    // Calculate realistic heights/widths based on pages
-    const height = Math.min(Math.max((pages / 2) + 100, 160), 320);
-    const width = Math.min(Math.max((pages / 10) + 20, 24), 50);
-
-    const newBook = {
-      id: Date.now(),
-      title,
-      author,
-      color: style.bg,
-      text: style.text,
-      starsColor: style.star,
-      rating,
-      height,
-      width
-    };
-
-    setBooks(prev => [...prev, newBook]);
-    setShowAddModal(false);
-    setNewBookForm({ title: '', author: '', rating: 5, pages: 300 });
-  };
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const parsedBooks = parseGoodreadsCSV(event.target.result);
-        if (parsedBooks.length === 0) {
-          setError("No valid books found. Make sure this is a Goodreads CSV export.");
-        } else {
-          setBooks(parsedBooks);
-          setShowModal(false);
-          setError('');
-        }
-      } catch (err) {
-        setError("Error parsing CSV. Please ensure it's a valid Goodreads export file.");
-        console.error(err);
-      }
-    };
-    reader.readAsText(file);
   };
 
   return (
@@ -527,20 +428,6 @@ export default function App() {
             {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
             {soundEnabled ? 'Sound On' : 'Sound Off'}
           </button>
-          <button 
-            onClick={() => setShowAddModal(true)}
-            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm transition-all flex items-center gap-2 border border-white/10 shadow-sm"
-          >
-            <Plus size={16} />
-            Add Book
-          </button>
-          <button 
-            onClick={() => setShowModal(true)}
-            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm transition-all flex items-center gap-2 border border-white/10 shadow-sm"
-          >
-            <Upload size={16} />
-            Import CSV
-          </button>
         </div>
       </div>
 
@@ -573,10 +460,18 @@ export default function App() {
           <div className="min-w-max mx-auto px-12 md:px-24 flex flex-col items-center">
             
             {/* Books Container */}
-            <div className="flex items-end justify-center relative z-10 px-4">
-              {books.map((book, index) => (
-                <Book key={book.id} book={book} index={index} soundEnabled={soundEnabled} setTooltip={setTooltip} onClick={setSelectedBook} />
-              ))}
+            <div className="flex items-end justify-center relative z-10 px-4 min-h-[320px]">
+              {isLoading ? (
+                <div className="flex items-center justify-center h-full w-full absolute pb-10">
+                  <div className="text-white/50 text-sm tracking-[0.2em] font-medium animate-pulse">
+                    LOADING SHELF...
+                  </div>
+                </div>
+              ) : (
+                books.map((book, index) => (
+                  <Book key={book.id} book={book} index={index} soundEnabled={soundEnabled} setTooltip={setTooltip} onClick={setSelectedBook} />
+                ))
+              )}
             </div>
 
             {/* The Physical Shelf Line */}
@@ -721,143 +616,6 @@ export default function App() {
               alt="La Tregua Full Sticker" 
               className="w-full max-h-[80vh] object-contain rounded-full shadow-2xl"
             />
-          </div>
-        </div>
-      )}
-
-      {/* Goodreads Import Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-            <button 
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-            >
-              <X size={20} />
-            </button>
-            
-            <h3 className="text-2xl font-serif text-gray-900 mb-2">Connect Goodreads</h3>
-            <p className="text-gray-600 text-sm mb-6">
-              Goodreads disabled their developer API, so we can't connect automatically. Instead, you can export your library and drop the file here!
-            </p>
-
-            <div className="bg-blue-50 text-blue-800 p-4 rounded-xl text-sm mb-6 flex gap-3 items-start border border-blue-100">
-              <Info className="shrink-0 mt-0.5" size={18} />
-              <div>
-                <strong>How to get your CSV:</strong>
-                <ol className="list-decimal ml-4 mt-1 space-y-1">
-                  <li>Go to Goodreads.com and log in.</li>
-                  <li>Click "My Books" in the header.</li>
-                  <li>Scroll to the bottom left and click "Import and export".</li>
-                  <li>Click the "Export Library" button and save the CSV.</li>
-                </ol>
-              </div>
-            </div>
-
-            {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 border border-red-100">
-                {error}
-              </div>
-            )}
-
-            <input 
-              type="file" 
-              accept=".csv"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-
-            <button 
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full bg-[#386AF5] hover:bg-blue-700 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
-            >
-              <Upload size={18} />
-              Select Goodreads CSV File
-            </button>
-            
-            <button 
-              onClick={() => {
-                setBooks(INITIAL_BOOKS);
-                setShowModal(false);
-              }}
-              className="w-full mt-3 text-gray-500 hover:text-gray-800 py-2 text-sm font-medium"
-            >
-              Load Demo Shelf
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Add Book Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-            <button 
-              onClick={() => setShowAddModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-            >
-              <X size={20} />
-            </button>
-            
-            <h3 className="text-2xl font-serif text-gray-900 mb-6">Add a Book</h3>
-            
-            <form onSubmit={handleAddBook} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                <input 
-                  type="text" 
-                  required
-                  value={newBookForm.title}
-                  onChange={e => setNewBookForm({...newBookForm, title: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="e.g. The Hobbit"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Author (Last Name)</label>
-                <input 
-                  type="text" 
-                  required
-                  value={newBookForm.author}
-                  onChange={e => setNewBookForm({...newBookForm, author: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="e.g. Tolkien"
-                />
-              </div>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Pages (Thickness)</label>
-                  <input 
-                    type="number" 
-                    required
-                    min="1"
-                    value={newBookForm.pages}
-                    onChange={e => setNewBookForm({...newBookForm, pages: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                  <select 
-                    value={newBookForm.rating}
-                    onChange={e => setNewBookForm({...newBookForm, rating: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                  >
-                    {[5,4,3,2,1,0].map(num => (
-                      <option key={num} value={num}>{num} {num === 1 ? 'Star' : 'Stars'}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <button 
-                type="submit"
-                className="w-full mt-4 bg-[#386AF5] hover:bg-blue-700 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-md"
-              >
-                <Plus size={18} />
-                Add to Shelf
-              </button>
-            </form>
           </div>
         </div>
       )}
