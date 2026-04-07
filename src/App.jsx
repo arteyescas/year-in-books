@@ -3,15 +3,15 @@ import { X, Volume2, VolumeX } from 'lucide-react';
 
 // --- MOCK DATA ---
 const INITIAL_BOOKS = [
-  { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, pages: 360, height: 280, width: 30, starsColor: 'text-pink-600', coverUrl: './covers/The_Love_Lie.jpeg' },
-  { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, pages: 180, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: './covers/Beatriz_y_los_cuerpos_celestes.jpeg' },
-  { id: 3, title: 'RELATOS LUMBUNG', author: 'BROWN', color: 'bg-[#f4cc5c]', text: 'text-gray-800', rating: 3, pages: 240, height: 220, width: 36, starsColor: 'text-gray-800', coverUrl: './covers/Relatos_Lumbung.jpeg' },
-  { id: 4, title: 'ARDE JOSEFINA', author: 'REYES RETANA', color: 'bg-[#31565a]', text: 'text-white', rating: 3, pages: 260, height: 230, width: 38, starsColor: 'text-orange-400', coverUrl: './covers/Arde_Josefina.jpeg' },
-  { id: 5, title: 'NO DEJAR QUE SE APAGUE EL FUEGO', author: 'TOEWS', color: 'bg-[#379a78]', text: 'text-white', rating: 3, pages: 260, height: 230, width: 34, starsColor: 'text-gray-900', coverUrl: './covers/Fight_Night.jpeg', label: 'La Tregua' },
-  { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, pages: 120, height: 160, width: 40, starsColor: 'text-white', coverUrl: './covers/Pensamiento_Erotico.jpeg' },
-  { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, pages: 120, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: './covers/Cabeza_de_mi_Padre.jpeg' },
-  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, pages: 300, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/Orbital.jpeg', label: 'La Tregua' },
-  { id: 9, title: 'PERSEPOLIS', author: 'SATRAPI', color: 'bg-[#1e1f26]', text: 'text-teal-400', rating: 4, pages: 120, height: 160, width: 36, starsColor: 'text-pink-600', coverUrl: './covers/PERSEPOLIS.jpeg' }
+  { id: 1, title: 'THE LOVE LIE', author: 'MCCALLAN', color: 'bg-[#1e1f26]', text: 'text-gray-300', rating: 3, pages: 360, height: 280, width: 30, starsColor: 'text-pink-600', coverUrl: './covers/The_Love_Lie.jpeg', monthRead: 0 }, // Jan
+  { id: 2, title: 'BEATRIZ Y LOS CUERPOS CELESTES', author: 'ETXEBARRIA', color: 'bg-[#f8b15d]', text: 'text-gray-900', rating: 2, pages: 180, height: 190, width: 32, starsColor: 'text-gray-800', coverUrl: './covers/Beatriz_y_los_cuerpos_celestes.jpeg', monthRead: 1 }, // Feb
+  { id: 3, title: 'RELATOS LUMBUNG', author: 'BROWN', color: 'bg-[#f4cc5c]', text: 'text-gray-800', rating: 3, pages: 240, height: 220, width: 36, starsColor: 'text-gray-800', coverUrl: './covers/Relatos_Lumbung.jpeg', monthRead: 2 }, // Mar
+  { id: 4, title: 'ARDE JOSEFINA', author: 'REYES RETANA', color: 'bg-[#31565a]', text: 'text-white', rating: 3, pages: 260, height: 230, width: 38, starsColor: 'text-orange-400', coverUrl: './covers/Arde_Josefina.jpeg', monthRead: 2 }, // Mar
+  { id: 5, title: 'NO DEJAR QUE SE APAGUE EL FUEGO', author: 'TOEWS', color: 'bg-[#379a78]', text: 'text-white', rating: 3, pages: 260, height: 230, width: 34, starsColor: 'text-gray-900', coverUrl: './covers/Fight_Night.jpeg', label: 'La Tregua', monthRead: 4 }, // May
+  { id: 6, title: 'EL PENSAMIENTO ERÓTICO', author: 'TORRES', color: 'bg-[#e76d5f]', text: 'text-white', rating: 3, pages: 120, height: 160, width: 40, starsColor: 'text-white', coverUrl: './covers/Pensamiento_Erotico.jpeg', monthRead: 6 }, // Jul
+  { id: 7, title: 'LA CABEZA DE MI PADRE', author: 'MURILLO', color: 'bg-[#6c7a36]', text: 'text-white', rating: 4, pages: 120, height: 160, width: 28, starsColor: 'text-yellow-400', coverUrl: './covers/Cabeza_de_mi_Padre.jpeg', monthRead: 7 }, // Aug
+  { id: 8, title: 'ORBITAL', author: 'HARVEY', color: 'bg-[#314a2a]', text: 'text-white', rating: 3, pages: 300, height: 250, width: 30, starsColor: 'text-yellow-400', coverUrl: './covers/Orbital.jpeg', label: 'La Tregua', monthRead: 9 }, // Oct
+  { id: 9, title: 'PERSEPOLIS', author: 'SATRAPI', color: 'bg-[#1e1f26]', text: 'text-teal-400', rating: 4, pages: 120, height: 160, width: 36, starsColor: 'text-pink-600', coverUrl: './covers/PERSEPOLIS.jpeg', monthRead: 10 } // Nov
 ];
 
 // --- GOOGLE SHEETS CONFIG ---
@@ -124,12 +124,15 @@ const parseGoogleSheetCSV = (csvText) => {
   const coverIdx = headers.findIndex(h => h === 'cover url' || h === 'cover');
   const labelIdx = headers.findIndex(h => h === 'label');
   
-  // Custom Overrides
+  // Custom Overrides & Timelines
   const heightIdx = headers.findIndex(h => h === 'height');
   const widthIdx = headers.findIndex(h => h === 'width');
   const colorIdx = headers.findIndex(h => h === 'color' || h === 'bg color');
   const textColorIdx = headers.findIndex(h => h === 'text color');
   const starsColorIdx = headers.findIndex(h => h === 'stars color' || h === 'star color');
+  
+  // Look for a date column to plot on the timeline
+  const dateIdx = headers.findIndex(h => h === 'date read' || h === 'date' || h === 'finished');
 
   if (titleIdx === -1) return [];
 
@@ -166,6 +169,27 @@ const parseGoogleSheetCSV = (csvText) => {
       const customBgColor = colorIdx !== -1 && row[colorIdx] ? row[colorIdx].replace(/"/g, '').trim() : null;
       const customTextColor = textColorIdx !== -1 && row[textColorIdx] ? row[textColorIdx].replace(/"/g, '').trim() : null;
       const customStarsColor = starsColorIdx !== -1 && row[starsColorIdx] ? row[starsColorIdx].replace(/"/g, '').trim() : null;
+      
+      // Extract and parse Date for the Timeline
+      let monthRead = null;
+      if (dateIdx !== -1 && row[dateIdx]) {
+        const dateStr = row[dateIdx].replace(/"/g, '').trim();
+        if (dateStr) {
+          const d = new Date(dateStr);
+          if (!isNaN(d.getTime())) {
+            monthRead = d.getMonth(); // 0 is January, 11 is December
+          } else {
+            // Manual fallback parsing if the standard Date object fails
+            const parts = dateStr.split(/[-/]/);
+            if (parts.length >= 2) {
+               const p0 = parseInt(parts[0]);
+               const p1 = parseInt(parts[1]);
+               if (p0 > 12 && p1 <= 12) monthRead = p1 - 1; // Assuming DD/MM/YYYY
+               else if (p0 <= 12) monthRead = p0 - 1; // Assuming MM/DD/YYYY
+            }
+          }
+        }
+      }
 
       const style = getDeterminantColor(title);
       // Use custom height/width if provided, otherwise calculate from pages
@@ -181,6 +205,7 @@ const parseGoogleSheetCSV = (csvText) => {
         starsColor: style.star,
         rating: isNaN(rating) ? 0 : rating,
         pages: isNaN(pages) ? 300 : pages, // Saved so we can tally stats!
+        monthRead, // Saved so we can plot it!
         height,
         width,
         coverUrl,
@@ -242,7 +267,7 @@ const PixelCat = ({ flip = false }) => {
     >
       <img 
         // Replace the link below with your direct .gif link if you want to change it!
-        src="https://i.pinimg.com/originals/e8/d0/f1/e8d0f1794e2520ac2367c1d21c0966e9.gif" 
+        src="https://i.pinimg.com/originals/a2/12/37/a21237a810f607cda747d7c6d6706915.gif" 
         alt="Animated Pixel Cat" 
         className="w-full h-full object-contain pointer-events-none"
         style={{ imageRendering: 'pixelated' }}
@@ -251,6 +276,52 @@ const PixelCat = ({ flip = false }) => {
           e.target.style.display = 'none'; // Hide gracefully if the image link ever breaks
         }}
       />
+    </div>
+  );
+};
+
+// Reading Timeline Component
+const Timeline = ({ books }) => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  
+  // Group books by the month they were read
+  const booksByMonth = Array(12).fill().map(() => []);
+  books.forEach(b => {
+    if (b.monthRead !== null && b.monthRead >= 0 && b.monthRead <= 11) {
+      booksByMonth[b.monthRead].push(b);
+    }
+  });
+
+  // If no books have dates, don't show the timeline
+  if (booksByMonth.every(monthArray => monthArray.length === 0)) return null;
+
+  return (
+    <div className="w-full max-w-2xl mx-auto mt-10 mb-4 px-4 z-10 relative hidden md:block">
+      <div className="flex justify-between items-end pb-2 border-b border-white/20">
+        {months.map((month, idx) => (
+          <div key={month} className="flex flex-col items-center relative w-full">
+            {/* Colored Dots for Books */}
+            <div className="flex flex-col-reverse gap-1.5 mb-2 h-16 justify-start">
+              {booksByMonth[idx].map((book, bIdx) => (
+                <div 
+                  key={bIdx} 
+                  className={`w-2.5 h-2.5 rounded-full shadow-md border border-white/20 cursor-pointer hover:scale-150 transition-transform ${book.color}`} 
+                  style={{ backgroundColor: book.customBgColor || undefined }}
+                  title={`${toTitleCase(book.title)}`}
+                ></div>
+              ))}
+            </div>
+            
+            {/* Timeline Tick */}
+            <div className="w-px h-2 bg-white/30 absolute -bottom-2"></div>
+            
+            {/* Month Label */}
+            <span className="text-white/50 text-[9px] font-medium uppercase tracking-widest mt-3 absolute -bottom-6">
+              {month}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -378,6 +449,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(hasSheetUrl);
   
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const fileInputRef = useRef(null);
   
   // Dynamic Environment States
   const [timeOfDay, setTimeOfDay] = useState('day');
@@ -625,10 +697,13 @@ export default function App() {
               <div className="absolute top-full left-4 right-4 h-4 bg-black/10 blur-sm rounded-b-full"></div>
             </div>
             
-            <div className="mt-8 flex flex-col items-center">
+            <div className="mt-8 flex flex-col items-center w-full">
+              
+              {/* Reading Timeline Layer */}
+              <Timeline books={books} />
               
               {/* Dynamic Stats Row */}
-              <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 text-white/50 text-xs font-medium tracking-widest uppercase mb-2 drop-shadow-sm">
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3 md:gap-4 text-white/50 text-xs font-medium tracking-widest uppercase mb-2 drop-shadow-sm">
                 <span>{books.length} {books.length === 1 ? 'Book' : 'Books'}</span>
                 {books.length > 0 && (
                   <>
